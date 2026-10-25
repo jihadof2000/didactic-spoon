@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Drugs Alarm</string>
+    <string name="channel_name">منبه الأدوية</string>
+    <string name="channel_desc">تنبيهات مواعيد الأدوية</string>
+    <string name="share_title">مشاركة رمز المتابعة</string>
+</resources>
