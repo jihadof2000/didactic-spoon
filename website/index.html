@@ -507,10 +507,10 @@ function drawDots(){$("#dots").innerHTML=[0,1,2,3].map(i=>'<i class="'+(i<pin.le
  };$("#keys").append(b)});
 
 /* ---- caregiver: add / edit ---- */
-function fillForm(m){editId=m?m.id:null;refreshPatientOptions();$("#mPatient").value=m&&m.patientId?String(m.patientId):"";$("#mn").value=m?(m.name||""):"";$("#me").value=m?(m.nameEn||""):"";$("#mStrength").value=m?(m.strength||""):"";$("#mDose").value=m?(m.dose||""):"";fType=m?(m.type||"pill"):"pill";fAuto=!m;fTimes=m?[...m.times]:[];fPhoto=m?m.photo:null;fVoice=m?m.voice:null;fInterval=m&&m.intervalHours?String(m.intervalHours):"";fDurationValue=m&&m.durationValue?String(m.durationValue):"";fDurationUnit=m&&m.durationUnit?m.durationUnit:(m&&m.end?"":"ongoing");$("#mInterval").value=fInterval;$("#mt").value=(m&&m.times&&m.times[0])||"08:00";$("#mDurationValue").value=fDurationValue||"";$("#mDurationUnit").value=fDurationUnit||"ongoing";drawForm();updateDosePreview()}
+function fillForm(m){editId=m?m.id:null;refreshPatientOptions();$("#mPatient").value=m&&m.patientId?String(m.patientId):"";$("#mn").value=m?(m.name||""):"";$("#me").value=m?(m.nameEn||""):"";$("#mStrength").value=m?(m.strength||""):"";$("#mDose").value=m?(m.dose||""):"";fType=m?(m.type||"pill"):"pill";fAuto=!m;fTimes=m?[...m.times]:[];fPhoto=m?m.photo:null;fVoice=m?m.voice:null;fInterval=m&&m.intervalHours?String(m.intervalHours):"";fDurationValue=m?(m.durationValue?String(m.durationValue):""):"30";fDurationUnit=m?(m.durationUnit||"days"):"days";$("#mInterval").value=fInterval;$("#mt").value=(m&&m.times&&m.times[0])||"08:00";$("#mDurationValue").value=fDurationValue;$("#mDurationUnit").value=fDurationUnit;drawForm();updateDosePreview()}
 function drawForm(){
  $("#ft").textContent=L(editId?"edit":"add");$("#add").textContent=L(editId?"saveE":"save");$("#cn").hidden=!editId;
- $("#mInterval").value=fInterval;$("#mDurationValue").value=fDurationValue;$("#mDurationUnit").value=fDurationUnit;
+ $("#mInterval").value=fInterval;$("#mDurationValue").value=fDurationValue;$("#mDurationUnit").value=fDurationUnit;$("#mDurationValue").disabled=fDurationUnit==="ongoing";
  $("#intervalHint").textContent=fInterval?"سيتم تكرار التنبيه كل "+fInterval+" ساعة بدءاً من "+($("#mt").value||"08:00")+".":"اختر وقت البداية، ثم أضف الأوقات يدوياً أو حدد الفاصل بالساعات.";
  $("#rec").textContent=L(recorder?"stop":"rec");
  const ch=$("#chips");ch.innerHTML="";
@@ -558,7 +558,7 @@ $("#add").onclick=async()=>{
  if(!fTimes.length&&$("#mt").value)fTimes.push($("#mt").value);
  if(fInterval)fTimes=makeIntervalTimes($("#mt").value||"08:00",fInterval);
  if((!name&&!nameEn)||!fTimes.length){alert(L("need"));return}
- if(fDurationUnit!=="ongoing"&&(!Number(fDurationValue)||Number(fDurationValue)<1)){alert("يرجى تحديد مدة العلاج بالأيام أو الأشهر، أو اختيار مستمر.");return}
+ if(fDurationUnit!=="ongoing"&&fDurationValue!==""&&(!Number(fDurationValue)||Number(fDurationValue)<1)){alert("يرجى تحديد مدة العلاج بالأيام أو الأشهر، أو اختيار مستمر.");return}
  const btn=$("#add");btn.disabled=true;
  try{
   const photo=await uploadMediaValue(fPhoto,"image"),voice=await uploadMediaValue(fVoice,"audio");
