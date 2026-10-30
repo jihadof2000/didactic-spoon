@@ -515,7 +515,7 @@ function drawForm(){
  $("#mStrengthLabel").textContent=fType==="capsule"?"تركيز الكبسولة (ملي غرام)":"تركيز الحبة (ملي غرام)";
  $("#mDoseLabel").textContent=isLiquid?"الجرعة المطلوبة (ملي ليتر)":"الجرعة المطلوبة (ملي غرام)";
  $("#mDose").placeholder=isLiquid?"مثال: 5":"مثال: 250";
- $("#ft").textContent=L(editId?"edit":"add");$("#add").textContent=L(editId?"saveE":"save");$("#cn").hidden=!editId;
+ $("#ft").textContent=L(editId?"edit":"add");$("#add").textContent=L(editId?"saveE":"save");updateDosePreview();$("#cn").hidden=!editId;
  $("#mInterval").value=fInterval;$("#mDurationValue").value=fDurationValue;$("#mDurationUnit").value=fDurationUnit;$("#mDurationValue").disabled=fDurationUnit==="ongoing";
  $("#intervalHint").textContent=fInterval?"سيتم تكرار التنبيه كل "+fInterval+" ساعة بدءاً من "+($("#mt").value||"08:00")+".":"اختر وقت البداية، ثم أضف الأوقات يدوياً أو حدد الفاصل بالساعات.";
  $("#rec").textContent=L(recorder?"stop":"rec");
@@ -605,7 +605,7 @@ function tabletUnitSvg(part){
 function renderDoseVisual(m){
  const el=$("#doseVisual");if(!el)return;
  el.hidden=true;el.innerHTML="";
- if(!m||!["pill","capsule"].includes(m.type)||!m.strength||!m.dose||m.strength<=0||m.dose<=0)return;
+ if(!m||m.type!=="pill"||!m.strength||!m.dose||m.strength<=0||m.dose<=0)return;
  const n=m.dose/m.strength,near=(a,b)=>Math.abs(a-b)<0.001;
  let parts=[],caption="";
  if(near(n,.25)){parts=[.25];caption="ربع قرص"}
