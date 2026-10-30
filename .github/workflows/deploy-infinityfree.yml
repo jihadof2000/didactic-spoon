@@ -1,0 +1,24 @@
+name: Deploy InfinityFree website
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'website/**'
+  workflow_dispatch:
+jobs:
+  deploy:
+    if: ${{ vars.ENABLE_INFINITYFREE_DEPLOY == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy website files to InfinityFree
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          server-dir: ${{ vars.INFINITYFREE_SERVER_DIR }}
+          local-dir: ./website/
+          dangerous-clean-slate: false
