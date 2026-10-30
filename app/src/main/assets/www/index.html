@@ -341,6 +341,26 @@ function load(){try{const d=JSON.parse(localStorage.getItem("sanad2")||"null");i
  return{lang:"ar",pin:"",pinSet:0,setupDone:0,role:"",meds:[],log:[],done:{},snooze:{},alerted:{},seeded:0}}
 S.meds.forEach(m=>{if(!m.type)m.type='pill';if(m.nameEn===undefined){if(/[A-Za-z]/.test(m.name||'')&&!/[\u0600-\u06FF]/.test(m.name)){m.nameEn=m.name;m.name=''}else m.nameEn=''}});
 function save(){try{localStorage.setItem("sanad2",JSON.stringify(S))}catch(e){}try{nativeSync()}catch(e){}}
+async function uploadMediaValue(value,kind){
+ if(!value)return null;
+ if(typeof value==="string"&&!value.startsWith("data:"))return value;
+ const blob=await (await fetch(value)).blob();
+ const fd=new FormData();fd.append("file",blob,kind==="image"?"photo.jpg":"voice.webm");fd.append("kind",kind);
+ const response=await fetch("/api/upload.php",{method:"POST",body:fd,credentials:"same-origin"});
+ let result={};try{result=await response.json()}catch(e){}
+ if(!response.ok||!result.url)throw new Error(result.error||"تعذر رفع الملف إلى الخادم");
+ return result.url;
+}
+async function migrateLegacyMedia(){
+ let changed=false;
+ for(const m of S.meds){
+  try{
+   if(m.photo&&String(m.photo).startsWith("data:")){m.photo=await uploadMediaValue(m.photo,"image");changed=true}
+   if(m.voice&&String(m.voice).startsWith("data:")){m.voice=await uploadMediaValue(m.voice,"audio");changed=true}
+  }catch(e){console.warn("Media migration pending",e)}
+ }
+ if(changed)save();
+}
 function NA(){return !!(window.Android&&typeof window.Android.sync==="function")}
 let _nativeSyncTimer=null;
 function nativeSync(){
@@ -506,13 +526,18 @@ $("#rec").onclick=async()=>{
   recorder.start();drawForm()}
  catch(e){recorder=null;$("#rs").textContent=L("mic")}
 };
-$("#add").onclick=()=>{
+$("#add").onclick=async()=>{
  const name=$("#mn").value.trim(),nameEn=$("#me").value.trim();
  if(!fTimes.length&&$("#mt").value)fTimes.push($("#mt").value);
  if((!name&&!nameEn)||!fTimes.length){alert(L("need"));return}
- const m={id:editId||Date.now(),name,nameEn,patientId:$("#mPatient").value||null,type:fType,strength:Number($("#mStrength").value)||null,dose:Number($("#mDose").value)||null,times:[...fTimes].sort(),photo:fPhoto,voice:fVoice,end:editId?((S.meds.find(x=>x.id===editId)||{}).end||null):null};
- if(editId)S.meds=S.meds.map(x=>x.id===editId?m:x);else S.meds.push(m);
- logIt("saved",name||nameEn);sig="";fillForm(null);renderCare();tick()
+ const btn=$("#add");btn.disabled=true;
+ try{
+  const photo=await uploadMediaValue(fPhoto,"image"),voice=await uploadMediaValue(fVoice,"audio");
+  const m={id:editId||Date.now(),name,nameEn,patientId:$("#mPatient").value||null,type:fType,strength:Number($("#mStrength").value)||null,dose:Number($("#mDose").value)||null,times:[...fTimes].sort(),photo,voice,end:editId?((S.meds.find(x=>x.id===editId)||{}).end||null):null};
+  if(editId)S.meds=S.meds.map(x=>x.id===editId?m:x);else S.meds.push(m);
+  logIt("saved",name||nameEn);sig="";fillForm(null);renderCare();tick()
+ }catch(e){alert("لم يتم حفظ الدواء لأن رفع الصورة أو التسجيل إلى الموقع لم ينجح. تحقق من اتصال الإنترنت ثم حاول مجدداً.\n"+e.message)}
+ finally{btn.disabled=false}
 };
 $("#tst").onclick=()=>{
  const m=S.meds[0]||{id:0,name:"تجريبي",nameEn:"Sample",type:"pill",times:["08:00"]};
@@ -616,19 +641,21 @@ function wizRender(){
    c.append(pv,n,t);b.append(c)}
   b.append(mk("btn",L("wMore"),()=>{W=newW();wi=wSteps().indexOf("name");wizRender()},"width:100%;min-height:68px;font-size:22px"))}
 }
-function wizNext(){
+async function wizNext(){
  const k=wSteps()[wi];
  if(k==="pin"){const v=($("#wp")||{}).value||"";if(!/^\d{4}$/.test(v)){alert(L("wPinH"));return}S.pin=v;S.pinSet=1;save();wizRender();return}
  if(k==="helper"){S.phone=(($("#wph")||{}).value||"").trim();S.helperAsked=1;save();wizRender();return}
  if(k==="name"&&!(W.name.trim()||W.nameEn.trim())){alert(L("wNeedN"));return}
  if(k==="time"&&!W.times.length){alert(L("wNeedT"));return}
  if(k==="dur"){if((W.strength&&!W.dose)||(!W.strength&&W.dose)){alert("أدخل التركيز والجرعة معاً أو اتركهما فارغين");return}let end=null;if(W.days){const e=new Date();e.setDate(e.getDate()+W.days);e.setHours(23,59,59,0);end=+e}
-  S.meds.push({id:Date.now(),name:W.name.trim(),nameEn:W.nameEn.trim(),type:W.type,strength:Number(W.strength)||null,dose:Number(W.dose)||null,times:[...W.times].sort(),photo:W.photo,voice:null,end});
+  const uploadedPhoto=await uploadMediaValue(W.photo,"image");
+   S.meds.push({id:Date.now(),name:W.name.trim(),nameEn:W.nameEn.trim(),type:W.type,strength:Number(W.strength)||null,dose:Number(W.dose)||null,times:[...W.times].sort(),photo:uploadedPhoto,voice:null,end});
   logIt("saved",W.name.trim()||W.nameEn.trim());S.setupDone=1;save()}
  if(k==="done"){S.setupDone=1;save();$("#wiz").hidden=true;$("#care").hidden=true;$("#app").hidden=false;document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.nav==="home"));sig="";tick();return}
  wi++;wizRender()
 }
 $("#wnext").onclick=wizNext;
+setTimeout(()=>migrateLegacyMedia(),2500);
 $("#wback").onclick=()=>{if(wi===0)$("#wiz").hidden=true;else{wi--;wizRender()}};
 $("#wlang").onclick=()=>setLang(S.lang==="ar"?"en":"ar");
 $("#wadd").onclick=()=>{$("#care").hidden=true;wizOpen()};
