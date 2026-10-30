@@ -335,7 +335,7 @@ drops:SV('<rect x="38" y="6" width="24" height="16" rx="4" fill="#D9480F"/><rect
 };
 const TYPES=["pill","syrup","spray","ointment","injection","drops"];
 const BOTTLE=ICONS.pill;
-let S=load(),test=null,sig="",cur={},recorder=null,lastVoice=0,pin="",editId=null,fTimes=[],fPhoto=null,fVoice=null,fType="pill",fAuto=true,gateTarget=null,fInterval="",fDurationValue="30",fDurationUnit="days";
+let S=load(),test=null,sig="",cur={},recorder=null,lastVoice=0,pin="",editId=null,fTimes=[],fPhoto=null,fVoice=null,fType="pill",fAuto=true,gateTarget=null,fInterval="",fDurationValue="30",fDurationUnit="days",fDurationTouched=true;
 const L=k=>D[S.lang][k];
 const mAr=m=>m.name||m.nameEn||"",mEn=m=>m.nameEn||"";
 const mPrim=m=>S.lang==="ar"?(m.name||m.nameEn):(m.nameEn||m.name);
@@ -507,7 +507,7 @@ function drawDots(){$("#dots").innerHTML=[0,1,2,3].map(i=>'<i class="'+(i<pin.le
  };$("#keys").append(b)});
 
 /* ---- caregiver: add / edit ---- */
-function fillForm(m){editId=m?m.id:null;refreshPatientOptions();$("#mPatient").value=m&&m.patientId?String(m.patientId):"";$("#mn").value=m?(m.name||""):"";$("#me").value=m?(m.nameEn||""):"";$("#mStrength").value=m?(m.strength||""):"";$("#mDose").value=m?(m.dose||""):"";fType=m?(m.type||"pill"):"pill";fAuto=!m;fTimes=m?[...m.times]:[];fPhoto=m?m.photo:null;fVoice=m?m.voice:null;fInterval=m&&m.intervalHours?String(m.intervalHours):"";fDurationValue=m?(m.durationValue?String(m.durationValue):""):"30";fDurationUnit=m?(m.durationUnit||"days"):"days";$("#mInterval").value=fInterval;$("#mt").value=(m&&m.times&&m.times[0])||"08:00";$("#mDurationValue").value=fDurationValue;$("#mDurationUnit").value=fDurationUnit;drawForm();updateDosePreview()}
+function fillForm(m){editId=m?m.id:null;refreshPatientOptions();$("#mPatient").value=m&&m.patientId?String(m.patientId):"";$("#mn").value=m?(m.name||""):"";$("#me").value=m?(m.nameEn||""):"";$("#mStrength").value=m?(m.strength||""):"";$("#mDose").value=m?(m.dose||""):"";fType=m?(m.type||"pill"):"pill";fAuto=!m;fTimes=m?[...m.times]:[];fPhoto=m?m.photo:null;fVoice=m?m.voice:null;fInterval=m&&m.intervalHours?String(m.intervalHours):"";fDurationValue=m?(m.durationValue?String(m.durationValue):""):"30";fDurationUnit=m?(m.durationUnit||"days"):"days";fDurationTouched=!m;$("#mInterval").value=fInterval;$("#mt").value=(m&&m.times&&m.times[0])||"08:00";$("#mDurationValue").value=fDurationValue;$("#mDurationUnit").value=fDurationUnit;drawForm();updateDosePreview()}
 function drawForm(){
  $("#ft").textContent=L(editId?"edit":"add");$("#add").textContent=L(editId?"saveE":"save");$("#cn").hidden=!editId;
  $("#mInterval").value=fInterval;$("#mDurationValue").value=fDurationValue;$("#mDurationUnit").value=fDurationUnit;$("#mDurationValue").disabled=fDurationUnit==="ongoing";
@@ -537,8 +537,8 @@ $("#cn").onclick=()=>fillForm(null);
 function makeIntervalTimes(start,hours){const [h,mi]=start.split(":").map(Number);const out=[];for(let n=0;n<24;n+=Number(hours)){const total=(h*60+mi+n*60)%1440;out.push(String(Math.floor(total/60)).padStart(2,"0")+":"+String(total%60).padStart(2,"0"))}return [...new Set(out)].sort()}
 $("#mInterval").onchange=()=>{fInterval=$("#mInterval").value;if(fInterval)fTimes=makeIntervalTimes($("#mt").value||"08:00",fInterval);drawForm()};
 $("#mt").onchange=()=>{if(fInterval)fTimes=makeIntervalTimes($("#mt").value,fInterval);drawForm()};
-$("#mDurationValue").oninput=()=>fDurationValue=$("#mDurationValue").value;
-$("#mDurationUnit").onchange=()=>{fDurationUnit=$("#mDurationUnit").value;$("#mDurationValue").disabled=fDurationUnit==="ongoing";if(fDurationUnit==="ongoing")fDurationValue="";};
+$("#mDurationValue").oninput=()=>{fDurationValue=$("#mDurationValue").value;fDurationTouched=true};
+$("#mDurationUnit").onchange=()=>{fDurationUnit=$("#mDurationUnit").value;fDurationTouched=true;$("#mDurationValue").disabled=fDurationUnit==="ongoing";if(fDurationUnit==="ongoing")fDurationValue="";};
 $("#at").onclick=()=>{const v=$("#mt").value;if(fInterval){fTimes=makeIntervalTimes(v,fInterval)}else if(v&&!fTimes.includes(v)){fTimes.push(v)}drawForm()};
 $("#mp").onchange=e=>{
  const f=e.target.files[0];if(!f)return;const fr=new FileReader();
@@ -564,8 +564,7 @@ $("#add").onclick=async()=>{
   const photo=await uploadMediaValue(fPhoto,"image"),voice=await uploadMediaValue(fVoice,"audio");
   const previous=editId?(S.meds.find(x=>x.id===editId)||{}):{};
   let end=previous.end||null;
-  if(fDurationUnit==="ongoing")end=null;
-  else if(Number(fDurationValue)>0){const until=new Date();if(fDurationUnit==="months")until.setMonth(until.getMonth()+Number(fDurationValue));else until.setDate(until.getDate()+Number(fDurationValue));until.setHours(23,59,59,999);end=+until}
+  if(!editId||fDurationTouched){if(fDurationUnit==="ongoing")end=null;else if(Number(fDurationValue)>0){const until=new Date();if(fDurationUnit==="months")until.setMonth(until.getMonth()+Number(fDurationValue));else until.setDate(until.getDate()+Number(fDurationValue));until.setHours(23,59,59,999);end=+until}}
   const m={id:editId||Date.now(),name,nameEn,patientId:$("#mPatient").value||null,type:fType,strength:Number($("#mStrength").value)||null,dose:Number($("#mDose").value)||null,times:[...fTimes].sort(),intervalHours:Number(fInterval)||null,durationValue:Number(fDurationValue)||null,durationUnit:fDurationUnit,photo,voice,end};
   if(editId)S.meds=S.meds.map(x=>x.id===editId?m:x);else S.meds.push(m);
   logIt("saved",name||nameEn);sig="";fillForm(null);renderCare();tick()
