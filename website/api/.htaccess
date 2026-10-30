@@ -1,0 +1,4 @@
+Options -Indexes
+<FilesMatch "^(?!upload\.php$).+">
+  Require all denied
+</FilesMatch>
