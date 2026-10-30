@@ -13,6 +13,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import org.json.JSONObject
+import org.json.JSONTokener
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -23,6 +25,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var web: WebView
     private var pendingMic: PermissionRequest? = null
     private var firstResume = true
+    private var pendingSanad: String? = null
+    private var pendingPatients: String? = null
+    private var loadingLegacy = false
+    private val remoteUrl = "https://sand.site.je/"
 
     private val notifPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -63,6 +69,40 @@ class MainActivity : AppCompatActivity() {
                 return loader.shouldInterceptRequest(request.url)
             }
 
+            override fun onPageFinished(view: WebView, url: String) {
+                super.onPageFinished(view, url)
+                val prefs = getSharedPreferences("sanad_web_migration", MODE_PRIVATE)
+                if (url.startsWith("https://appassets.androidplatform.net/assets/www/index.html") &&
+                    !prefs.getBoolean("done", false) && !loadingLegacy
+                ) {
+                    loadingLegacy = true
+                    view.evaluateJavascript("JSON.stringify({sanad2:localStorage.getItem('sanad2'),sanadPatients:localStorage.getItem('sanadPatients')})") { encoded ->
+                        try {
+                            val raw = JSONTokener(encoded).nextValue() as? String
+                            val data = if (raw != null) JSONObject(raw) else JSONObject()
+                            pendingSanad = data.optString("sanad2").takeIf { it.isNotEmpty() && it != "null" }
+                            pendingPatients = data.optString("sanadPatients").takeIf { it.isNotEmpty() && it != "null" }
+                        } catch (_: Exception) { }
+                        view.post { view.loadUrl(remoteUrl) }
+                    }
+                } else if (url.startsWith(remoteUrl) && !prefs.getBoolean("done", false)) {
+                    val script = StringBuilder("(function(){")
+                    if (pendingSanad != null) {
+                        script.append("if(localStorage.getItem('sanad2')===null)localStorage.setItem('sanad2',")
+                        script.append(JSONObject.quote(pendingSanad)).append(");")
+                    }
+                    if (pendingPatients != null) {
+                        script.append("if(localStorage.getItem('sanadPatients')===null)localStorage.setItem('sanadPatients',")
+                        script.append(JSONObject.quote(pendingPatients)).append(");")
+                    }
+                    script.append("})();")
+                    view.evaluateJavascript(script.toString(), null)
+                    prefs.edit().putBoolean("done", true).apply()
+                    pendingSanad = null
+                    pendingPatients = null
+                }
+            }
+
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val u = request.url
                 if (u.host == "appassets.androidplatform.net" || u.host == "sand.site.je") return false
@@ -93,7 +133,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         web.addJavascriptInterface(Bridge(applicationContext), "Android")
-        web.loadUrl("https://sand.site.je/")
+        if (getSharedPreferences("sanad_web_migration", MODE_PRIVATE).getBoolean("done", false)) {
+            web.loadUrl(remoteUrl)
+        } else {
+            web.loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
+        }
 
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
