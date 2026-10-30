@@ -164,7 +164,7 @@ class MainActivity : AppCompatActivity() {
             override fun onPermissionRequest(request: PermissionRequest) {
                 // Grant only microphone access requested by our HTTPS website.
                 val trustedOrigin = request.origin.scheme == "https" &&
-                    request.origin.host?.lowercase() in setOf("sand.site.je", "www.sand.site.je")
+                    (request.origin.host ?: "").lowercase() in setOf("sand.site.je", "www.sand.site.je")
                 val audioOnly = request.resources.all { it == PermissionRequest.RESOURCE_AUDIO_CAPTURE }
                 if (trustedOrigin && audioOnly && request.resources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
                     if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.RECORD_AUDIO)
