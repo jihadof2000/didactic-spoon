@@ -7,6 +7,9 @@ import android.net.Uri
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.app.NotificationManager
+import android.app.AlertDialog
 import android.view.WindowManager
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
@@ -160,7 +163,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun onPermissionRequest(request: PermissionRequest) {
                 // Grant only microphone access requested by our HTTPS website.
-                val trustedOrigin = request.origin.scheme == "https" && request.origin.host == "sand.site.je"
+                val trustedOrigin = request.origin.scheme == "https" &&
+                    request.origin.host?.lowercase() in setOf("sand.site.je", "www.sand.site.je")
                 val audioOnly = request.resources.all { it == PermissionRequest.RESOURCE_AUDIO_CAPTURE }
                 if (trustedOrigin && audioOnly && request.resources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
                     if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.RECORD_AUDIO)
@@ -174,6 +178,10 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     request.deny()
                 }
+            }
+
+            override fun onPermissionRequestCanceled(request: PermissionRequest) {
+                if (pendingMic === request) pendingMic = null
             }
         }
 
@@ -189,6 +197,23 @@ class MainActivity : AppCompatActivity() {
             != PackageManager.PERMISSION_GRANTED
         ) {
             notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        // Android 14+ may block full-screen alarm notifications until the user enables this access.
+        if (Build.VERSION.SDK_INT >= 34) {
+            val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            if (!nm.canUseFullScreenIntent()) {
+                AlertDialog.Builder(this)
+                    .setTitle("تفعيل تنبيهات سند")
+                    .setMessage("لإظهار تنبيه الدواء على شاشة القفل، يرجى السماح للتطبيق بعرض التنبيهات بملء الشاشة في الإعدادات التالية.")
+                    .setPositiveButton("فتح الإعدادات") { _, _ ->
+                        try {
+                            startActivity(Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT,
+                                Uri.parse("package:$packageName")))
+                        } catch (_: Exception) { }
+                    }
+                    .setNegativeButton("لاحقاً", null)
+                    .show()
+            }
         }
     }
 
