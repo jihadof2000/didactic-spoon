@@ -3,6 +3,7 @@ package com.fidaa.drugsalarm
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -13,6 +14,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.ValueCallback
 import org.json.JSONObject
 import org.json.JSONTokener
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,6 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var web: WebView
     private var pendingMic: PermissionRequest? = null
+    private var pendingFileChooser: ValueCallback<Array<Uri>>? = null
     private var firstResume = true
     private var pendingSanad: String? = null
     private var pendingPatients: String? = null
@@ -32,6 +35,24 @@ class MainActivity : AppCompatActivity() {
 
     private val notifPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+
+    private val fileChooser =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val callback = pendingFileChooser
+            pendingFileChooser = null
+            if (callback != null) {
+                val data = result.data
+                val uris = if (result.resultCode == RESULT_OK && data != null) {
+                    val clip = data.clipData
+                    when {
+                        clip != null -> Array(clip.itemCount) { i -> clip.getItemAt(i).uri }
+                        data.data != null -> arrayOf(data.data!!)
+                        else -> null
+                    }
+                } else null
+                callback.onReceiveValue(uris)
+            }
+        }
 
     private val micPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -116,8 +137,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         web.webChromeClient = object : WebChromeClient() {
+            override fun onShowFileChooser(
+                webView: WebView?,
+                filePathCallback: ValueCallback<Array<Uri>>?,
+                fileChooserParams: FileChooserParams?
+            ): Boolean {
+                if (filePathCallback == null || fileChooserParams == null) return false
+                pendingFileChooser?.onReceiveValue(null)
+                pendingFileChooser = filePathCallback
+                return try {
+                    fileChooser.launch(fileChooserParams.createIntent())
+                    true
+                } catch (_: Exception) {
+                    pendingFileChooser = null
+                    filePathCallback.onReceiveValue(null)
+                    false
+                }
+            }
+
             override fun onPermissionRequest(request: PermissionRequest) {
-                if (request.resources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
+                // Grant only microphone access requested by our HTTPS website.
+                val trustedOrigin = request.origin.scheme == "https" && request.origin.host == "sand.site.je"
+                val audioOnly = request.resources.all { it == PermissionRequest.RESOURCE_AUDIO_CAPTURE }
+                if (trustedOrigin && audioOnly && request.resources.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE)) {
                     if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.RECORD_AUDIO)
                         == PackageManager.PERMISSION_GRANTED
                     ) {
