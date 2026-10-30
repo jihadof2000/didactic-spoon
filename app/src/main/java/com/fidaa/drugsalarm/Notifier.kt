@@ -14,7 +14,7 @@ import androidx.core.app.NotificationCompat
 
 /** Loud, repeating alarm notification that opens the app over the lock screen. */
 object Notifier {
-    private const val CHANNEL = "med_alarm_v1"
+    private const val CHANNEL = "med_alarm_v2"
     private const val NOTIF_ID = 4101
     private val VIBRATION = longArrayOf(0, 700, 400, 700, 400, 700)
 
