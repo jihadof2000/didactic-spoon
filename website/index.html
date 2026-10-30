@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12803A">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-512.png">
+<title>سند · Sanad</title>
+<style>
+:root{--bg:#FFF8EC;--card:#fff;--ink:#14181F;--mute:#4A5260;--line:#D8CDB6;--g:#12803A;--gk:#fff;--o:#D9480F;--ok:#fff;--warn:#B3261E;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F141B;--card:#1B222D;--ink:#F5F7FA;--mute:#B9C2D0;--line:#3A4556;--g:#3DDC84;--gk:#04210F;--o:#FF922B;--ok:#1A0B00;--warn:#FF8A80}}
+:root[data-theme="dark"]{--bg:#0F141B;--card:#1B222D;--ink:#F5F7FA;--mute:#B9C2D0;--line:#3A4556;--g:#3DDC84;--gk:#04210F;--o:#FF922B;--ok:#1A0B00;--warn:#FF8A80}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,"Noto Naskh Arabic",Arial,sans-serif}
+[hidden]{display:none!important}
+#app{height:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding:8px 14px 14px;transition:opacity .15s}
+header{display:flex;justify-content:space-between;align-items:center;min-height:56px}
+#logo{display:flex;align-items:center;gap:10px;padding:4px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+#logo i,.wbrand i{width:40px;height:40px;border-radius:50%;background:var(--g);display:block;position:relative;flex:none}
+#logo i:after,.wbrand i:after{content:"";position:absolute;inset:11px 8px;border-radius:9px;background:var(--gk);transform:rotate(-35deg)}
+#logo div,.wbrand div{display:flex;flex-direction:column;line-height:1.05}
+#logo b,.wbrand b{font-size:30px}
+#logo small,.wbrand small{font-size:15px;font-weight:700;color:var(--mute);letter-spacing:.5px}
+.langb{min-height:52px;min-width:96px;border-radius:26px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:20px;font-weight:800;padding:0 18px}
+.card{flex:none;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;background:var(--card);border:3px solid var(--line);border-radius:30px;padding:14px 12px}
+.card.due{border-color:var(--o);animation:glow 1.6s infinite}
+@keyframes glow{50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--o) 30%,transparent)}}
+@media (prefers-reduced-motion:reduce){.card.due{animation:none}#app{transition:none}}
+.st{font-size:20px;font-weight:700;color:var(--mute)}
+.card.due .st{color:var(--o)}
+.picw{position:relative;width:min(180px,22dvh);aspect-ratio:1;flex:none}
+.pen{position:absolute;bottom:-8px;inset-inline-end:-18px;width:54px;height:54px;border-radius:50%;background:var(--card);color:var(--ink);border:3px solid var(--line);font-size:26px;display:flex;align-items:center;justify-content:center;padding:0}
+.pen:active{transform:scale(.94)}
+.pic{width:100%;height:100%;border-radius:24px;background:#fff;border:2px solid var(--line);overflow:hidden;padding:6px}
+.pic img{display:block;width:calc(100% + 12px);height:calc(100% + 12px);margin:-6px;object-fit:cover;max-width:none}
+.nm{font-size:clamp(38px,12vw,56px);font-weight:800;line-height:1.1;overflow-wrap:anywhere}
+.tm{font-size:clamp(44px,14vw,66px);font-weight:800;line-height:1;direction:ltr;font-variant-numeric:tabular-nums}
+.tm small{font-size:.38em;font-weight:700;margin-inline-start:.3em;color:var(--mute)}
+.big{flex:1;min-height:80px;border:0;border-radius:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;font-family:inherit}
+.big .ic{font-size:clamp(28px,8vw,38px);line-height:1}
+.big b{font-size:clamp(34px,10.5vw,48px);line-height:1.2}
+.big.g{background:var(--g);color:var(--gk)}
+.big.o{background:var(--o);color:var(--ok)}
+.big:active{transform:scale(.98)}
+.big:disabled{opacity:.35}
+#toast{position:fixed;inset:0;display:none;align-items:center;justify-content:center;text-align:center;pointer-events:none;z-index:30}
+#toast.show{display:flex}
+#toast.g{background:var(--g);color:var(--gk)}
+#toast.o{background:var(--o);color:var(--ok)}
+#toast b{display:block;font-size:clamp(52px,16vw,80px);line-height:1.2;padding:0 20px}
+.ov{position:fixed;inset:0;background:var(--bg);overflow:auto;z-index:20;padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 28px}
+.cin{max-width:560px;margin:0 auto;font-size:19px}
+.gbox{max-width:320px;margin:8vh auto 0;text-align:center}
+#dots{display:flex;justify-content:center;gap:14px;margin:18px 0}
+#dots i{width:22px;height:22px;border-radius:50%;border:3px solid var(--ink)}
+#dots i.f{background:var(--ink)}
+#keys{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;direction:ltr}
+#keys button{min-height:68px;font-size:30px;font-weight:700;border-radius:18px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+.box{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;margin:8px 0}
+label{display:block;font-weight:700;margin:14px 0 6px}
+input[type=text],input[type=time],input[type=tel]{width:100%;min-height:54px;font-size:21px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px}
+.btn{min-height:54px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-size:19px;font-weight:700;padding:0 16px;font-family:inherit}
+.btn.p{background:var(--g);color:var(--gk);border-color:var(--g);width:100%;min-height:62px;font-size:22px;margin-top:16px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{border-radius:20px;border:2px solid var(--g);background:transparent;color:var(--ink);font-size:18px;font-weight:700;min-height:44px;padding:0 14px;direction:ltr}
+.tp{border-radius:16px;border:2px solid var(--line);background:var(--card);color:var(--ink);font-family:inherit;font-size:17px;font-weight:700;padding:6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:84px}
+.tp .ti{width:42px;height:42px}
+.tp.on{border-color:var(--g);box-shadow:0 0 0 3px var(--g)}
+.nm2{font-size:clamp(22px,7vw,30px);font-weight:700;color:var(--mute);direction:ltr}
+.pv{width:120px;height:120px;border-radius:16px;background:#fff;border:2px solid var(--line);overflow:hidden;padding:4px;flex:none}
+.pv img{display:block;width:calc(100% + 8px);height:calc(100% + 8px);margin:-4px;object-fit:cover;max-width:none}
+input[type=file]{font-size:17px;width:100%;margin-top:8px}
+h3{margin:22px 0 6px;font-size:21px}
+.log{font-size:16px;padding:6px 0;border-bottom:1px solid var(--line)}
+.log.w{color:var(--warn);font-weight:700}
+.small{font-size:15px;color:var(--mute)}
+audio{width:100%;margin-top:8px}
+.wbrand{display:flex;align-items:center;gap:10px}
+.wdots{display:flex;gap:8px;margin:16px 0 8px}.wdots i{flex:1;height:8px;border-radius:4px;background:var(--line)}.wdots i.f{background:var(--g)}
+#wiz h2{font-size:30px;margin:12px 0 14px}
+#wiz input[type=text],#wiz input[type=time],#wiz input[type=tel]{min-height:64px;font-size:26px}
+
+/* Sanad professional dashboard */
+body{overflow:hidden}
+#layout{height:100dvh;display:grid;grid-template-columns:250px minmax(0,1fr);direction:rtl}
+#sidebar{background:var(--card);border-left:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;gap:10px;z-index:5}
+#sidebar .brand{display:flex;align-items:center;gap:12px;padding:6px 8px 22px;border-bottom:1px solid var(--line);margin-bottom:8px}
+#sidebar .brand i{width:42px;height:42px;border-radius:14px;background:var(--g);position:relative}
+#sidebar .brand i:after{content:"";position:absolute;inset:12px 9px;background:var(--gk);border-radius:5px;transform:rotate(-35deg)}
+#sidebar .brand b{font-size:25px}#sidebar .brand small{display:block;color:var(--mute);font-weight:700}
+#sidebar .exitNav{margin-top:auto;color:#b42318;border:1px solid #f2c7c3;background:#fff8f7}#sidebar .exitNav:hover{background:#feeceb}
+.navbtn{border:0;background:transparent;color:var(--ink);font-family:inherit;font-size:16px;font-weight:700;text-align:right;border-radius:12px;padding:14px 13px;min-height:50px;cursor:pointer;display:flex;align-items:center;gap:10px}
+.navbtn.active,.navbtn:hover{background:color-mix(in srgb,var(--g) 14%,var(--card));color:var(--g)}
+#mainarea{min-width:0;overflow:auto;position:relative;padding:16px 20px 30px}
+#mainarea #app{height:auto;min-height:calc(100dvh - 50px);max-width:850px;width:100%;padding:8px 10px 20px;gap:14px}
+#mainarea #app .card{min-height:310px;justify-content:center}
+#mainarea #app .big{flex:none;min-height:86px}
+#mainarea #app header{min-height:64px}
+#dashboardFooter{text-align:center;color:var(--mute);font-size:13px;font-weight:800;padding:20px 8px}
+#dashboardFooter strong{display:inline-block;border:2px solid var(--g);border-radius:12px;padding:10px 16px;color:var(--g);font-size:15px;background:var(--card)}
+#care{z-index:10;background:var(--bg);inset:0 250px 0 0;padding:18px 24px 30px}
+#care .cin{max-width:100%;margin:0 auto}
+#care .cin>.row:first-child{position:sticky;top:-18px;background:var(--bg);padding:10px 0;z-index:2}
+#care .box{max-width:100%}
+#care input[type=number],#care input[type=tel],#care input[type=text],#care input[type=time],#care textarea,#care select{width:100%;min-height:48px;font-size:17px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);padding:9px 12px}
+#care textarea{min-height:80px;resize:vertical}
+#care .dose-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#dosePreview{border:1px dashed var(--g);border-radius:12px;padding:12px;background:color-mix(in srgb,var(--g) 7%,var(--card));font-weight:800;margin-top:12px}
+#patientPanel,#activityPanel{display:none}
+#patientPanel.active,#activityPanel.active{display:block}
+#medicinePanel.hiddenPanel{display:none}
+#patientList .box{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.patient-actions{display:flex;gap:8px;flex-wrap:wrap}
+#doseLine{font-size:clamp(17px,3vw,23px);font-weight:850;color:var(--g);text-align:center;line-height:1.5;max-width:100%}
+#reminderAr{font-size:clamp(17px,3vw,22px);font-weight:850;color:var(--ink);text-align:center;line-height:1.45;max-width:100%;direction:rtl;border-top:1px solid var(--line);padding-top:7px;width:100%}
+#doseVisual{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;width:100%;padding:8px 4px 2px}
+#doseVisual[hidden]{display:none!important}
+#doseVisual .doseUnit{width:clamp(76px,13vw,112px);height:auto;filter:drop-shadow(0 3px 2px #00000012)}
+#doseVisual .doseCount{width:100%;text-align:center;font-size:clamp(18px,3vw,25px);font-weight:950;color:var(--ink);line-height:1.2}
+#doseVisual .doseCaption{width:100%;text-align:center;font-size:14px;font-weight:800;color:var(--g)}
+@media(max-width:800px){#sidebar .exitNav{margin-top:0}#layout{grid-template-columns:1fr;grid-template-rows:1fr 66px}#sidebar{grid-row:2;grid-column:1;flex-direction:row;justify-content:space-around;padding:5px 7px;border-left:0;border-top:1px solid var(--line);gap:2px}#sidebar .brand{display:none}.navbtn{flex:1;justify-content:center;flex-direction:column;gap:2px;font-size:11px;padding:4px 2px;min-height:54px}.navbtn span{font-size:20px}#mainarea{grid-row:1;padding:8px 10px 12px}#mainarea #app{min-height:calc(100dvh - 90px)}#care{inset:0;padding:12px 12px 24px}#care .cin{padding-bottom:20px}.dose-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){#mainarea #app .card{min-height:250px}.picw{width:110px}.nm{font-size:36px}.tm{font-size:42px}#care .dose-grid{grid-template-columns:1fr}}
+
+
+/* Visible dashboard pages: management is part of the workspace, not a hidden settings overlay */
+#mainarea{position:relative;min-height:0}
+#homeOverview{max-width:1050px;margin:0 auto 16px;padding:8px 10px 0}
+.welcomeRow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 4px 20px}
+.welcomeRow h1{font-size:clamp(25px,3vw,36px);margin:5px 0;font-weight:900}
+.welcomeRow p,.sectionHeading p{margin:0;color:var(--mute);font-size:14px}
+.eyebrow{font-size:11px;letter-spacing:2px;color:var(--g);font-weight:900}
+.welcomeMark{width:62px;height:62px;border-radius:20px;background:var(--g);color:var(--gk);display:grid;place-items:center;font-size:36px;font-weight:900;box-shadow:0 8px 24px color-mix(in srgb,var(--g) 20%,transparent)}
+.metricGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:22px}
+.metricCard{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:18px;padding:16px;text-align:right;display:grid;grid-template-columns:42px 1fr;align-items:center;column-gap:10px;cursor:pointer;font-family:inherit;box-shadow:0 3px 14px #00000008}
+.metricCard:active{transform:translateY(1px)}
+.metricIcon{grid-row:span 3;width:42px;height:42px;border-radius:13px;background:color-mix(in srgb,var(--g) 12%,var(--card));color:var(--g);display:grid;place-items:center;font-size:23px}
+.metricLabel{font-size:14px;color:var(--mute);font-weight:800}.metricCard b{font-size:27px;line-height:1.2}.metricCard small{font-size:11px;color:var(--mute)}
+.sectionHeading{display:flex;justify-content:space-between;align-items:center;padding:0 4px 8px}.sectionHeading h2{font-size:20px;margin:0 0 3px}.liveDot{font-size:11px;color:var(--g);font-weight:900;background:color-mix(in srgb,var(--g) 10%,var(--card));border-radius:20px;padding:6px 10px}
+#mainarea #app{margin:0 auto;max-width:1050px;background:transparent}
+#mainarea #app .card{min-height:260px}
+#care.ov{position:absolute!important;inset:0!important;z-index:4!important;background:var(--bg)!important;overflow:auto!important;padding:20px clamp(12px,3vw,30px) 32px!important}
+#care .cin{max-width:1050px!important;margin:0 auto!important}
+#care .cin>.row:first-child{position:sticky;top:-20px;background:var(--bg);padding:12px 0 16px;z-index:3;border-bottom:1px solid var(--line);margin-bottom:12px}
+#care .cin>.row:first-child b{font-size:26px!important}
+#care .box{box-shadow:0 3px 14px #00000008}
+#care section h2{font-size:26px;margin:12px 0}
+#care #medicinePanel,#care #patientPanel,#care #activityPanel{max-width:920px;margin:0 auto}
+#care #medicinePanel>.box{padding:20px}
+#care #ml .box{padding:12px 16px}
+#care #patientPanel.active,#care #activityPanel.active{display:block}
+#care #medicinePanel.hiddenPanel{display:none}
+#care #patientPanel,#care #activityPanel,#care #aboutPanel{display:none}
+#care #aboutPanel.active{display:block;max-width:920px;margin:0 auto}
+.aboutHero{display:flex;align-items:center;gap:18px;padding:22px;border-radius:20px;background:linear-gradient(135deg,#eaf6ee,#fff8e9);border:1px solid var(--line);margin:12px 0 18px}
+.aboutMark{width:76px;height:76px;flex:0 0 76px;border-radius:22px;background:var(--g);color:white;display:grid;place-items:center;font-size:42px;font-weight:900}
+.aboutHero h2{margin:3px 0 7px;font-size:30px}.aboutHero p,.aboutBox p{line-height:1.9;margin:6px 0}
+.aboutBox{margin:12px 0;padding:20px}.aboutBox h3{margin:0 0 8px;font-size:21px}.aboutBox ul,.aboutBox ol{line-height:2.1;padding-right:24px;margin:8px 0}.studentCredits{border:2px solid var(--g)}.aboutNote{font-size:13px;line-height:1.8;color:var(--mute);text-align:center;margin:18px auto;max-width:850px}
+#patientList .box{background:var(--card);border-radius:16px}
+#patientList .box b{font-size:18px}
+#patientPanel .box{padding:20px}
+#care .dose-grid{gap:14px}
+#care .btn{cursor:pointer}
+@media(max-width:800px){
+ #layout{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) 68px}
+ #mainarea{grid-row:1;padding:8px 8px 12px}
+ #homeOverview{padding:4px 6px 0}
+ .welcomeRow{padding:8px 4px 14px}.welcomeMark{width:48px;height:48px;border-radius:15px;font-size:28px}
+ .metricGrid{gap:7px}.metricCard{padding:10px 8px;grid-template-columns:30px 1fr;column-gap:6px;border-radius:14px}.metricIcon{width:30px;height:30px;font-size:18px;border-radius:10px}.metricLabel{font-size:11px}.metricCard b{font-size:22px}.metricCard small{font-size:9px}
+ #mainarea #app{min-height:0;padding:4px 5px 16px;gap:10px}
+ #mainarea #app .card{min-height:220px}
+ #care.ov{padding:10px 10px 24px!important}
+ #care .cin>.row:first-child{top:-10px}
+ #care .dose-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:420px){.metricCard small{display:none}.metricGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+</style>
+</head>
+<body>
+<div id="layout">
+<aside id="sidebar">
+ <div class="brand"><i></i><div><b>سند</b><small>Sanad · إدارة العلاج</small></div></div>
+ <button class="navbtn active" data-nav="home"><span>⌂</span>الرئيسية</button>
+ <button class="navbtn" data-nav="patients"><span>♙</span>بيانات المرضى</button>
+ <button class="navbtn" data-nav="medicines"><span>▣</span>الأدوية والجرعات</button>
+ <button class="navbtn" data-nav="activity"><span>◷</span>سجل النشاط</button>
+ <button class="navbtn" data-nav="about"><span>ⓘ</span>من نحن</button>
+ <button class="navbtn exitNav" data-nav="exit" title="الخروج من لوحة التحكم والعودة إلى شاشة التذكير"><span>↩</span>خروج</button>
+</aside>
+<main id="mainarea">
+<div id="homeOverview">
+ <div class="welcomeRow"><div><div class="eyebrow">SANAD CARE</div><h1>لوحة التحكم</h1><p>إدارة المرضى والعلاج والتنبيهات من مكان واحد</p></div><div class="welcomeMark">س</div></div>
+ <div class="metricGrid">
+  <button class="metricCard" data-jump="patients"><span class="metricIcon">♙</span><span class="metricLabel">المرضى</span><b id="patientCount">0</b><small>إدارة بيانات المرضى</small></button>
+  <button class="metricCard" data-jump="medicines"><span class="metricIcon">✚</span><span class="metricLabel">الأدوية</span><b id="medicineCount">0</b><small>الأدوية والجرعات والمواعيد</small></button>
+  <button class="metricCard" data-jump="activity"><span class="metricIcon">◷</span><span class="metricLabel">سجل النشاط</span><b id="activityCount">0</b><small>متابعة سجل التنبيهات</small></button>
+ </div>
+ <div class="sectionHeading"><div><h2>التذكير القادم</h2><p>حالة الجرعة الحالية ومواعيد الدواء</p></div><span class="liveDot">● مباشر</span></div>
+</div>
+<div id="app">
+  <header>
+    <div id="logo"><i></i><div><b>سند</b><small>Sanad</small></div></div>
+    <button class="langb" id="lang"></button>
+  </header>
+
+  <div class="card" id="card">
+    <div class="st" id="st"></div>
+    <div class="picw"><div class="pic" id="pic"></div><button class="pen" id="pen" aria-label="تعديل المنبّه" title="تعديل المنبّه">✎</button></div>
+    <div class="nm" id="nm" dir="auto"></div>
+    <div class="nm2" id="nm2"></div>
+    <div class="tm" id="tm"></div>
+    <div id="doseLine" hidden></div>
+    <div id="reminderAr" hidden lang="ar" dir="rtl"></div>
+    <div id="doseVisual" hidden aria-label="صورة توضيحية لكمية الأقراص"></div>
+  </div>
+
+  <button class="big g" id="ok"><span class="ic">✔</span><b data-i="ok"></b></button>
+  <button class="big o" id="lt"><span class="ic">⏰</span><b data-i="lt"></b></button>
+</div>
+<div id="dashboardFooter"><strong><span data-i="credit">This program was designed and developed by students Fida Jehad Ismail and Asiyah Ahmed Abdullah Al-Harthi</span></strong></div>
+<div id="care" class="ov" hidden>
+  <div class="cin">
+    <div class="row"><b style="font-size:26px" data-i="careT"></b><button class="btn" id="cx">✕</button></div>
+
+    <section id="medicinePanel">
+    <button class="btn" id="wadd" style="width:100%;margin-top:12px" data-i="addWiz"></button>
+    <h3 id="ft"></h3>
+    <div class="box">
+      <label data-i="fName"></label><input id="mn" type="text" dir="rtl" lang="ar">
+      <label data-i="fNameEn"></label><input id="me" type="text" dir="ltr" lang="en">
+      <label for="mPatient">المريض المرتبط بهذا الدواء</label><select id="mPatient"><option value="">دواء عام / غير مرتبط بمريض محدد</option></select>
+      <div class="dose-grid">
+       <div><label>تركيز الوحدة (ملغ)</label><input id="mStrength" type="number" min="0" step="any" placeholder="مثال: 500"></div>
+       <div><label>الجرعة المطلوبة (ملغ)</label><input id="mDose" type="number" min="0" step="any" placeholder="مثال: 250"></div>
+      </div>
+      <div id="dosePreview">أدخل التركيز والجرعة لحساب عدد الحبات تلقائياً.</div>
+      <p class="small">يُستخدم الحساب للأقراص/الكبسولات فقط. تأكد من أن القرص قابل للقسم وأن الجرعة مطابقة للوصفة قبل اعتمادها.</p>
+      <p class="small" data-i="autoH" style="margin:8px 0 0"></p>
+      <label data-i="fType"></label><div class="chips" id="types" style="margin-top:0"></div>
+      <label data-i="fPhoto"></label>
+      <div class="row" style="justify-content:flex-start;gap:14px"><div class="pv" id="pv"></div><input id="mp" type="file" accept="image/*"></div>
+      <label data-i="fTimes"></label>
+      <div class="row" style="justify-content:flex-start"><input id="mt" type="time" value="08:00" style="max-width:170px"><button class="btn" id="at">＋</button></div>
+      <div class="chips" id="chips"></div>
+      <label data-i="fVoice"></label>
+      <div class="row" style="justify-content:flex-start"><button class="btn" id="rec"></button><span id="rs" class="small"></span></div>
+      <audio id="ra" controls hidden></audio>
+      <button class="btn p" id="add"></button>
+      <button class="btn" id="cn" style="width:100%;margin-top:10px" data-i="cancel" hidden></button>
+    </div>
+
+    <h3 data-i="w_helper"></h3>
+    <div class="box"><div class="small" data-i="wCode"></div>
+      <div id="sc" style="font-size:44px;font-weight:800;letter-spacing:10px;text-align:center;direction:ltr"></div>
+      <label data-i="wPhone"></label><input id="ph" type="tel" dir="ltr">
+      <button class="btn p" id="shr" data-i="wShare"></button></div>
+    <h3 data-i="meds"></h3><div id="ml"></div>
+    <button class="btn" id="tst" style="width:100%;margin-top:10px" data-i="test"></button>
+    <h3 data-i="act"></h3><div class="box" id="al"></div>
+    </section>
+    <section id="patientPanel">
+      <h2>بيانات المرضى</h2><p class="small">تُحفظ بيانات المرضى على هذا الجهاز والمتصفح الحالي، ولا تتم مزامنتها تلقائياً مع أجهزة أخرى.</p>
+      <div class="box">
+       <input id="patientId" type="hidden">
+       <label>اسم المريض</label><input id="patientName" type="text" placeholder="الاسم الكامل">
+       <div class="dose-grid"><div><label>العمر</label><input id="patientAge" type="number" min="0" placeholder="العمر"></div><div><label>رقم الهاتف</label><input id="patientPhone" type="tel" dir="ltr" placeholder="رقم التواصل"></div></div>
+       <label>ملاحظات</label><textarea id="patientNotes" placeholder="الحساسية أو ملاحظات الرعاية..."></textarea>
+       <button class="btn p" id="savePatient">حفظ بيانات المريض</button><button class="btn" id="cancelPatient" style="width:100%;margin-top:8px">مسح الحقول</button>
+      </div>
+      <h3>قائمة المرضى</h3><div id="patientList"></div>
+    </section>
+    <section id="activityPanel"><h2>سجل النشاط</h2><div id="activityList"></div></section>
+    <section id="aboutPanel">
+      <div class="aboutHero"><div class="aboutMark">س</div><div><div class="eyebrow">SANAD · سند</div><h2>من نحن</h2><p>منبّه سند لمساعدة المرضى ومقدمي الرعاية على تذكّر مواعيد الأدوية بطريقة واضحة وسهلة.</p></div></div>
+      <div class="box aboutBox"><h3>ما هو منبّه سند؟</h3><p>سند هو منبّه دوائي يعرض اسم الدواء وموعد تناوله والجرعة المحددة، ويمكنه إصدار تنبيه صوتي وعرض صورة توضيحية لكمية الأقراص عندما تكون بيانات التركيز والجرعة مدخلة.</p></div>
+      <div class="box aboutBox"><h3>لماذا هذا المنبّه مهم؟</h3><ul><li>يساعد على تذكّر مواعيد تناول الأدوية بانتظام.</li><li>يعرض معلومات الجرعة بصورة مبسطة لتسهيل فهمها.</li><li>يجمع بين التنبيه المرئي والصوتي، ليستفيد منه من يجد صعوبة في القراءة أو السماع؛ مع ضرورة متابعة مقدم الرعاية عند الحاجة.</li><li>يساعد أفراد الأسرة ومقدمي الرعاية على تنظيم مواعيد العلاج.</li></ul></div>
+      <div class="box aboutBox"><h3>رسالة المشروع</h3><p>نطمح إلى توظيف التقنية في خدمة المجتمع، ونشر الوعي بأهمية الالتزام بمواعيد الدواء، وتقديم وسيلة مساعدة سهلة الاستخدام لكبار السن والمرضى.</p></div>
+      <div class="box aboutBox studentCredits"><h3>إعداد وتنفيذ المشروع</h3><p>تم إنجاز هذا العمل بواسطة طالبات الصف الثامن من <strong>مدرسة سيح العافية للبنات</strong>:</p><ol><li>الطالبة <strong>فداء جهاد اسماعيل</strong></li><li>الطالبة <strong>آسيه احمد عبد الله الحارثي</strong></li></ol></div>
+      <p class="aboutNote">تنبيه: سند وسيلة مساعدة للتذكير فقط، ولا يُغني عن وصفة الطبيب أو إرشادات الصيدلي. يجب التأكد من الجرعة وطريقة تقسيم الأقراص من مختص.</p>
+    </section>
+    <div class="small" style="text-align:center;margin:26px 0 10px;font-weight:800"><span data-i="credit">This program was designed and developed by students Fida Jehad Ismail and Asiyah Ahmed Abdullah Al-Harthi</span></div>
+  </div>
+</div>
+</main>
+</div>
+
+<div id="wiz" class="ov" style="z-index:25" hidden>
+  <div class="cin">
+    <div class="row"><div class="wbrand"><i></i><div><b>سند</b><small>Sanad</small></div></div><button class="langb" id="wlang"></button></div>
+    <div class="wdots" id="wdots"></div>
+    <h2 id="wt"></h2>
+    <div id="wb"></div>
+    <div class="small" style="text-align:center;margin-top:28px;font-weight:800"><span data-i="credit">This program was designed and developed by students Fida Jehad Ismail and Asiyah Ahmed Abdullah Al-Harthi</span></div>
+    <div class="row" style="margin-top:24px;gap:12px"><button class="btn" id="wback" style="margin:0"></button><button class="btn p" id="wnext" style="margin:0;flex:1"></button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<div id="gate" class="ov" hidden>
+  <div class="gbox">
+    <b style="font-size:24px" data-i="pinT"></b>
+    <div id="dots"></div>
+    <div id="keys"></div>
+    <p class="small" data-i="pinH"></p>
+  </div>
+</div>
+
+
+
+<script>
+const $=s=>document.querySelector(s);
+const D={
+ar:{credit:"تم تصميم وتطوير هذا البرنامج بواسطة الطالبة فداء جهاد اسماعيل والطالبة آسيه احمد عبد الله الحارثي",w_role:"من سيستخدم التطبيق؟",wRoleS:"كبير السن (أنا)",wRoleF:"أحد أقاربه",wRoleH:"مرافق / مساعد",w_pin:"اختر رقماً سرياً من 4 أرقام",wPinH:"أدخل 4 أرقام. يحمي الإعدادات من التغيير بالخطأ",w_name:"ما اسم الدواء؟",wNeedN:"اكتب اسم الدواء",w_time:"متى يؤخذ الدواء؟",pOnce:"مرة يومياً",pTwice:"مرتان",pThrice:"3 مرات",wNeedT:"أضف وقتاً واحداً على الأقل",w_shape:"كيف شكل الدواء؟",wShapeH:"ستظهر هذه الصورة عند التذكير",w_dur:"كم مدة العلاج؟",d7:"أسبوع",d14:"أسبوعان",d30:"شهر",d0:"مستمر",w_done:"تمت الإضافة ✔",wMore:"＋ إضافة دواء آخر",wFin:"انتهيت",next:"التالي",back:"رجوع",addWiz:"＋ إضافة دواء خطوة بخطوة",w_helper:"هل تريد أن يتابعك أحد؟",wHelperH:"اختياري. شارك الرمز مع ابنك أو مساعدك، وأدخل رقمه ليصله تنبيه إن نسيت دواءك",wCode:"رمز المتابعة",wShare:"📤 مشاركة الرمز",wPhone:"رقم المساعد (اختياري)",shareMsg:"أستخدم تطبيق سند لتذكير الأدوية. رمز المتابعة: ",copied:"تم النسخ ✔",smsBtn:"📩 أرسل رسالة للمساعد",smsMsg:"تنبيه من سند: لم يتم تأكيد تناول دواء {n} خلال 15 دقيقة.",ok:"أخذت الدواء",lt:"تذكير بعد قليل",next:"الدواء القادم",now:"حان وقت دوائك",none:"لا توجد أدوية",noneH:"اطلب من العائلة إضافتها",am:"ص",pm:"م",toastOk:"أحسنت 👏",toastLt:"حسناً، سنذكّرك بعد قليل ⏰",pinT:"الرقم السري للعائلة",pinH:"",careT:"إعدادات العائلة",add:"إضافة دواء",edit:"تعديل الدواء",fName:"اسم الدواء بالعربي",fNameEn:"اسم الدواء بالإنجليزي",autoH:"اكتب الاسم وستظهر الصورة تلقائياً، أو ارفع صورة العلبة",fType:"نوع الدواء",t_pill:"حبوب",t_syrup:"شراب",t_spray:"بخاخ",t_ointment:"مرهم",t_injection:"حقنة",t_drops:"قطرة",fPhoto:"صورة الدواء",fTimes:"الأوقات",fVoice:"رسالة صوتية (اختياري)",rec:"🎙 تسجيل",stop:"⏹ إيقاف",save:"حفظ",saveE:"حفظ التعديلات",cancel:"إلغاء",meds:"الأدوية",test:"▶ تجربة التنبيه (10 ثوانٍ)",act:"النشاط",need:"أضف اسماً (عربي أو إنجليزي) ووقتاً واحداً على الأقل",mic:"التسجيل غير متاح",speak:"حان وقت دوائك",l_taken:"✔ أخذ الدواء",l_later:"⏰ طلب التذكير لاحقاً",l_alert:"⚠ لم يؤكد خلال 15 دقيقة — أُرسلت رسالة SMS للعائلة",l_saved:"💾 تم الحفظ",empty:"—",btn:"English"},
+en:{credit:"This program was designed and developed by students Fida Jehad Ismail and Asiyah Ahmed Abdullah Al-Harthi",w_role:"Who will use the app?",wRoleS:"The senior (me)",wRoleF:"A family member",wRoleH:"A helper / caregiver",w_pin:"Choose a 4-digit PIN",wPinH:"Enter 4 digits. It keeps settings safe from accidental changes",w_name:"What is the medicine name?",wNeedN:"Enter the medicine name",w_time:"When is it taken?",pOnce:"Once a day",pTwice:"Twice",pThrice:"3 times",wNeedT:"Add at least one time",w_shape:"What does it look like?",wShapeH:"This picture is shown when the reminder comes",w_dur:"How long is the treatment?",d7:"1 week",d14:"2 weeks",d30:"1 month",d0:"Ongoing",w_done:"Added ✔",wMore:"＋ Add another medicine",wFin:"Finish",next:"Next",back:"Back",addWiz:"＋ Add medicine step by step",w_helper:"Want someone to follow along?",wHelperH:"Optional. Share the code with a family member or helper, and add their number so they are alerted if you miss a dose",wCode:"Follow code",wShare:"📤 Share the code",wPhone:"Helper’s number (optional)",shareMsg:"I use Sanad for medicine reminders. Follow code: ",copied:"Copied ✔",smsBtn:"📩 Message the helper",smsMsg:"Sanad alert: {n} was not confirmed within 15 minutes.",ok:"I took it",lt:"Remind me later",next:"Next medicine",now:"Time for your medicine",none:"No medicines yet",noneH:"Ask a family member to add them",am:"AM",pm:"PM",toastOk:"Well done 👏",toastLt:"OK, we will remind you soon ⏰",pinT:"Family PIN",pinH:"",careT:"Family settings",add:"Add medicine",edit:"Edit medicine",fName:"Name in Arabic",fNameEn:"Name in English",autoH:"Type the name and a picture appears automatically, or upload a photo of the box",fType:"Medicine type",t_pill:"Pills",t_syrup:"Syrup",t_spray:"Spray",t_ointment:"Ointment",t_injection:"Injection",t_drops:"Drops",fPhoto:"Medicine photo",fTimes:"Times",fVoice:"Voice note (optional)",rec:"🎙 Record",stop:"⏹ Stop",save:"Save",saveE:"Save changes",cancel:"Cancel",meds:"Medicines",test:"▶ Test alarm (10 sec)",act:"Activity",need:"Add a name (Arabic or English) and at least one time",mic:"Recording unavailable",speak:"It is time for your medicine",l_taken:"✔ taken",l_later:"⏰ asked to be reminded later",l_alert:"⚠ No confirmation in 15 min — SMS sent to family",l_saved:"💾 saved",empty:"—",btn:"عربي"}
+};
+const SV=(b)=>'<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true">'+b+'</svg>';
+const ICONS={
+pill:SV('<rect x="30" y="8" width="40" height="16" rx="4" fill="#D9480F"/><rect x="26" y="22" width="48" height="70" rx="10" fill="#fff" stroke="#14181F" stroke-width="4"/><rect x="34" y="42" width="32" height="28" rx="4" fill="#12803A"/><path d="M50 49v14M43 56h14" stroke="#fff" stroke-width="5" stroke-linecap="round"/>'),
+syrup:SV('<rect x="38" y="6" width="24" height="14" rx="3" fill="#D9480F"/><rect x="42" y="18" width="16" height="12" fill="#fff" stroke="#14181F" stroke-width="4"/><rect x="24" y="30" width="52" height="62" rx="12" fill="#fff" stroke="#14181F" stroke-width="4"/><rect x="30" y="52" width="40" height="34" rx="6" fill="#C2255C"/><path d="M30 60h40" stroke="#fff" stroke-width="3"/>'),
+spray:SV('<rect x="34" y="34" width="34" height="58" rx="8" fill="#fff" stroke="#14181F" stroke-width="4"/><rect x="40" y="52" width="22" height="26" rx="4" fill="#1C7ED6"/><rect x="40" y="16" width="16" height="18" fill="#D9480F" stroke="#14181F" stroke-width="3"/><path d="M40 22H16v10h24" fill="#D9480F" stroke="#14181F" stroke-width="3"/><path d="M8 14l-5-4M8 26H2M8 38l-5 4" stroke="#14181F" stroke-width="3" stroke-linecap="round"/>'),
+ointment:SV('<path d="M18 30h56l8 6-8 6H18z" fill="#fff" stroke="#14181F" stroke-width="4"/><rect x="74" y="31" width="14" height="10" rx="2" fill="#D9480F" stroke="#14181F" stroke-width="3"/><path d="M24 36h44" stroke="#12803A" stroke-width="6"/><path d="M18 62c10-8 20 8 30 0s20 8 34 0" fill="none" stroke="#E8590C" stroke-width="7" stroke-linecap="round"/>'),
+injection:SV('<rect x="30" y="38" width="42" height="18" rx="4" transform="rotate(-35 51 47)" fill="#fff" stroke="#14181F" stroke-width="4"/><path d="M26 66L10 82" stroke="#14181F" stroke-width="4" stroke-linecap="round"/><path d="M62 24l14 10M68 18l14 10" stroke="#14181F" stroke-width="6" stroke-linecap="round"/><rect x="38" y="44" width="20" height="8" transform="rotate(-35 48 48)" fill="#1C7ED6"/>'),
+drops:SV('<rect x="38" y="6" width="24" height="16" rx="4" fill="#D9480F"/><rect x="42" y="20" width="16" height="30" fill="#fff" stroke="#14181F" stroke-width="4"/><path d="M50 58c-9 12-13 18-13 24a13 13 0 0 0 26 0c0-6-4-12-13-24z" fill="#1C7ED6" stroke="#14181F" stroke-width="3"/>')
+};
+const TYPES=["pill","syrup","spray","ointment","injection","drops"];
+const BOTTLE=ICONS.pill;
+let S=load(),test=null,sig="",cur={},recorder=null,lastVoice=0,pin="",editId=null,fTimes=[],fPhoto=null,fVoice=null,fType="pill",fAuto=true,gateTarget=null;
+const L=k=>D[S.lang][k];
+const mAr=m=>m.name||m.nameEn||"",mEn=m=>m.nameEn||"";
+const mPrim=m=>S.lang==="ar"?(m.name||m.nameEn):(m.nameEn||m.name);
+const mSec=m=>{const a=m.name||"",e=m.nameEn||"";if(!a||!e)return"";return S.lang==="ar"?e:a};
+const KW={spray:["بخاخ","بخّاخ","spray","ventolin","فنتولين","inhaler","seretide","symbicort"],syrup:["شراب","syrup","suspension","محلول","سائل"],ointment:["مرهم","كريم","ointment","cream","gel","جل"],injection:["حقنة","حقنه","انسولين","إنسولين","insulin","injection","lantus","لانتوس","إبرة"],drops:["قطرة","قطره","drops","drop"]};
+function guessType(t){t=(t||"").toLowerCase();for(const k in KW)if(KW[k].some(w=>t.includes(w)))return k;return"pill"}
+const mIcon=m=>ICONS[m.type]||ICONS.pill;
+function load(){try{const d=JSON.parse(localStorage.getItem("sanad2")||"null");if(d)return d}catch(e){}
+ return{lang:"ar",pin:"",pinSet:0,setupDone:0,role:"",meds:[],log:[],done:{},snooze:{},alerted:{},seeded:0}}
+S.meds.forEach(m=>{if(!m.type)m.type='pill';if(m.nameEn===undefined){if(/[A-Za-z]/.test(m.name||'')&&!/[\u0600-\u06FF]/.test(m.name)){m.nameEn=m.name;m.name=''}else m.nameEn=''}});
+function save(){try{localStorage.setItem("sanad2",JSON.stringify(S))}catch(e){}try{nativeSync()}catch(e){}}
+async function uploadMediaValue(value,kind){
+ if(!value)return null;
+ if(typeof value==="string"&&!value.startsWith("data:"))return value;
+ const blob=await (await fetch(value)).blob();
+ const fd=new FormData();fd.append("file",blob,kind==="image"?"photo.jpg":"voice.webm");fd.append("kind",kind);
+ const response=await fetch("/api/upload.php",{method:"POST",body:fd,credentials:"same-origin"});
+ let result={};try{result=await response.json()}catch(e){}
+ if(!response.ok||!result.url)throw new Error(result.error||"تعذر رفع الملف إلى الخادم");
+ return result.url;
+}
+async function migrateLegacyMedia(){
+ let changed=false;
+ for(const m of S.meds){
+  try{
+   if(m.photo&&String(m.photo).startsWith("data:")){m.photo=await uploadMediaValue(m.photo,"image");changed=true}
+   if(m.voice&&String(m.voice).startsWith("data:")){m.voice=await uploadMediaValue(m.voice,"audio");changed=true}
+  }catch(e){console.warn("Media migration pending",e)}
+ }
+ if(changed)save();
+}
+function NA(){return !!(window.Android&&typeof window.Android.sync==="function")}
+let _nativeSyncTimer=null;
+function nativeSync(){
+ if(!NA())return;
+ clearTimeout(_nativeSyncTimer);
+ _nativeSyncTimer=setTimeout(()=>{try{
+  const now=new Date(),ds=now.toDateString(),day=now.getFullYear()+"-"+p2(now.getMonth()+1)+"-"+p2(now.getDate()),items=[];
+  S.meds.forEach(m=>(m.times||[]).forEach(tm=>items.push({id:String(m.id),tm:tm,label:mPrim(m),end:m.end||0,skip:!!S.done[String(m.id)+"|"+tm+ds]})));
+  window.Android.sync(JSON.stringify({title:L("now"),day:day,items:items}));
+ }catch(e){}},300);
+}
+const p2=x=>String(x).padStart(2,"0");
+const parts=hm=>{const[h,m]=hm.split(":").map(Number);return[(h%12||12)+":"+p2(m),h<12?L("am"):L("pm")]};
+const fmtHM=hm=>parts(hm).join(" ");
+const fmtT=ms=>{const d=new Date(ms);return fmtHM(p2(d.getHours())+":"+p2(d.getMinutes()))};
+function logIt(k,n,w){S.log.unshift({t:Date.now(),k,n,w:!!w});S.log=S.log.slice(0,30);save()}
+
+if(false){const n=new Date(Date.now()-60000);
+ S.meds.push({id:1,name:"بانادول",nameEn:"Panadol",type:"pill",times:[p2(n.getHours())+":"+p2(n.getMinutes())],photo:null,voice:null},{id:2,name:"فيتامين د",nameEn:"Vitamin D",type:"pill",times:["21:00"],photo:null,voice:null});
+ S.seeded=1;save()}
+
+/* ---- language ---- */
+function setLang(l){
+ S.lang=l;save();document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr";
+ $("#app").dir=l==="ar"?"rtl":"ltr";$("#app").lang=l;
+ $("#pen").setAttribute("aria-label",l==="ar"?"تعديل المنبّه":"Edit alarm");$("#pen").title=l==="ar"?"تعديل المنبّه":"Edit alarm";
+ $("#logo small").textContent=l==="ar"?"إدارة العلاج":"Treatment management";
+ document.querySelectorAll("[data-i]").forEach(e=>e.textContent=L(e.dataset.i));
+ $("#lang").textContent=L("btn");$("#wlang").textContent=L("btn");if(!$("#wiz").hidden)wizRender();sig="";drawForm();if(!$("#care").hidden)renderCare();tick()
+}
+$("#lang").onclick=()=>{const a=$("#app");a.style.opacity=0;setTimeout(()=>{setLang(S.lang==="ar"?"en":"ar");a.style.opacity=1},150)};
+
+/* ---- schedule ---- */
+function status(now){
+ let due=null,next=null;
+ for(const m of S.meds)if(!(m.end&&now>m.end))for(const tm of m.times){
+  const[h,mi]=tm.split(":").map(Number),d=new Date(now);d.setHours(h,mi,0,0);
+  const k=m.id+"|"+tm;
+  if(S.done[k+d.toDateString()])d.setDate(d.getDate()+1);
+  const sn=S.snooze[k],o={m,tm,at:+d,key:k+d.toDateString(),sk:k};
+  const snoozed=sn&&sn>now&&o.at<=now;
+  if(o.at<=now&&!snoozed){if(!due||o.at<due.at)due=o}
+  else{if(snoozed)o.at=sn;if(!next||o.at<next.at)next=o}
+ }
+ if(test&&!(test.snz>now))due=test;
+ return{due,next}
+}
+function playVoice(m){
+ try{
+  if(m.voice)new Audio(m.voice).play().catch(()=>{});
+  if(NA()&&Android.speak){
+   const di=doseInstruction(m),arName=mAr(m),enName=mEn(m);
+   if(S.lang==="ar")Android.speak("حان وقت تناول الدواء"+(arName?": "+arName:"")+(di?". "+di:""),"ar");
+   else Android.speak("It is time to take your medicine"+(enName?": "+enName:"")+(m.strength&&m.dose?". Prescribed dose: "+m.dose+" milligrams. Tablet strength: "+m.strength+" milligrams.":""),"en");
+   return;
+  }
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const arName=mAr(m), enName=mEn(m);
+  const di=doseInstruction(m);
+  const arMsg="حان وقت تناول الدواء"+(arName?": "+arName:"")+(di?". "+di:"");
+  const arUtterance=new SpeechSynthesisUtterance(arMsg);arUtterance.lang="ar-SA";arUtterance.rate=.82;
+  speechSynthesis.speak(arUtterance);
+  if(S.lang==="en"){
+   let enMsg="It is time to take your medicine"+(enName?": "+enName:"");
+   if(m.strength&&m.dose)enMsg+=". Prescribed dose: "+m.dose+" milligrams. Tablet strength: "+m.strength+" milligrams.";
+   const enUtterance=new SpeechSynthesisUtterance(enMsg);enUtterance.lang="en-US";enUtterance.rate=.85;speechSynthesis.speak(enUtterance);
+  }
+ }catch(e){}
+}
+function renderCard(o,due){
+ $("#card").classList.toggle("due",due);
+ if(!o){$("#doseLine").hidden=true;$("#reminderAr").hidden=true;$("#reminderAr").textContent="";$("#doseVisual").hidden=true;$("#doseVisual").innerHTML="";$("#pic").innerHTML=BOTTLE;$("#nm2").textContent="";$("#st").textContent="";$("#nm").textContent=L("none");$("#tm").textContent=L("noneH");$("#tm").style.cssText="font-size:20px;font-weight:600;color:var(--mute);direction:inherit";return}
+ $("#tm").style.cssText="";
+ $("#pic").innerHTML=o.m.photo?'<img alt="" src="'+o.m.photo+'">':mIcon(o.m);
+ $("#st").textContent=L(due?"now":"next");
+ $("#nm").textContent=mPrim(o.m);$("#nm2").textContent=mSec(o.m);
+ $("#nm").dir=S.lang==="ar"?"rtl":"ltr";
+ const p=parts(o.tm);$("#tm").innerHTML=p[0]+"<small>"+p[1]+"</small>";
+ const dl=$("#doseLine"),di=doseInstruction(o.m);dl.hidden=!di;dl.textContent=di;
+ const ra=$("#reminderAr");ra.hidden=S.lang!=="en";ra.textContent="حان وقت تناول الدواء"+(mAr(o.m)?": "+mAr(o.m):"")+(di?" — "+di:"");
+ renderDoseVisual(o.m);
+}
+function tick(){
+ updateDashboardStats();
+ const now=Date.now();cur=status(now);const o=cur.due||cur.next;
+ if(cur.due){
+  if(now-cur.due.at>=(cur.due.lim||9e5)&&!S.alerted[cur.due.key]){S.alerted[cur.due.key]=1;logIt("alert",mPrim(cur.due.m),1)}
+  if(NA()&&document.visibilityState==="visible"){try{Android.silence()}catch(e){}}
+  if(now-lastVoice>6e4){lastVoice=now;playVoice(cur.due.m)}
+ }
+ const s=o?o.m.id+(cur.due?"D":"N")+o.tm+o.m.name+o.m.nameEn+o.m.type+(o.m.strength||"")+(o.m.dose||"")+S.lang+(o.m.photo?o.m.photo.length:0):"-";
+ if(s!==sig){sig=s;renderCard(o,!!cur.due)}
+ $("#ok").disabled=$("#lt").disabled=!o;
+}
+function toast(a,c){const t=$("#toast");t.innerHTML="<b>"+a+"</b>";t.className="show "+c;clearTimeout(toast.h);toast.h=setTimeout(()=>t.className="",2600)}
+$("#ok").onclick=()=>{
+ const o=cur.due||cur.next;if(!o)return;
+ if(o.lim)test=null;else{S.done[o.key]=1;delete S.snooze[o.sk];if(NA()){try{Android.silence()}catch(e){}}}
+ logIt("taken",mPrim(o.m));sig="";tick();toast(L("toastOk"),"g")
+};
+$("#lt").onclick=()=>{
+ const o=cur.due;
+ if(o){if(o.lim)test.snz=Date.now()+5000;else{S.snooze[o.sk]=Date.now()+6e5;if(NA()){try{Android.snooze(String(o.m.id),o.tm,600000)}catch(e){}}}logIt("later",mPrim(o.m));sig="";tick()}
+ toast(L("toastLt"),"o")
+};
+
+/* ---- hidden entry: hold the logo 3 seconds, then PIN ---- */
+let lp;const lg=$("#logo");
+lg.addEventListener("pointerdown",()=>{lp=setTimeout(()=>{try{navigator.vibrate(60)}catch(e){}desiredSection="medicines";openGate()},3000)});
+["pointerup","pointerleave","pointercancel"].forEach(e=>lg.addEventListener(e,()=>clearTimeout(lp)));
+$("#pen").onclick=()=>{const o=cur.due||cur.next;desiredSection="medicines";openGate(o&&!o.lim?o.m.id:null)};
+lg.addEventListener("contextmenu",e=>e.preventDefault());
+function openCare(){fillForm(S.meds.find(x=>x.id===gateTarget)||null);renderCare();$("#care").hidden=false;$("#app").hidden=true;$("#homeOverview").hidden=true;applyCareSection(desiredSection);if(desiredSection==="medicines")$("#ft").scrollIntoView()}
+function openGate(t){gateTarget=t||null;if(!S.pin){openCare();return}pin="";drawDots();$("#gate").hidden=false}
+function drawDots(){$("#dots").innerHTML=[0,1,2,3].map(i=>'<i class="'+(i<pin.length?"f":"")+'"></i>').join("")}
+["1","2","3","4","5","6","7","8","9","✕","0","⌫"].forEach(k=>{
+ const b=document.createElement("button");b.textContent=k;
+ b.onclick=()=>{
+  if(k==="✕"){$("#gate").hidden=true;return}
+  if(k==="⌫")pin=pin.slice(0,-1);else if(pin.length<4)pin+=k;
+  drawDots();
+  if(pin.length===4){const ok=pin===S.pin;setTimeout(()=>{pin="";drawDots();if(ok){$("#gate").hidden=true;openCare()}},180)}
+ };$("#keys").append(b)});
+
+/* ---- caregiver: add / edit ---- */
+function fillForm(m){editId=m?m.id:null;refreshPatientOptions();$("#mPatient").value=m&&m.patientId?String(m.patientId):"";$("#mn").value=m?(m.name||""):"";$("#me").value=m?(m.nameEn||""):"";$("#mStrength").value=m?(m.strength||""):"";$("#mDose").value=m?(m.dose||""):"";fType=m?(m.type||"pill"):"pill";fAuto=!m;fTimes=m?[...m.times]:[];fPhoto=m?m.photo:null;fVoice=m?m.voice:null;drawForm();updateDosePreview()}
+function drawForm(){
+ $("#ft").textContent=L(editId?"edit":"add");$("#add").textContent=L(editId?"saveE":"save");$("#cn").hidden=!editId;
+ $("#rec").textContent=L(recorder?"stop":"rec");
+ const ch=$("#chips");ch.innerHTML="";
+ fTimes.sort().forEach(x=>{const b=document.createElement("button");b.className="chip";b.textContent=fmtHM(x)+" ✕";b.onclick=()=>{fTimes=fTimes.filter(y=>y!==x);drawForm()};ch.append(b)});
+ $("#pv").innerHTML=fPhoto?'<img alt="" src="'+fPhoto+'">':ICONS[fType];
+ const tp=$("#types");tp.innerHTML="";TYPES.forEach(k=>{const b=document.createElement("button");b.type="button";b.className="tp"+(k===fType?" on":"");b.innerHTML='<span class="ti">'+ICONS[k]+"</span><span>"+L("t_"+k)+"</span>";b.onclick=()=>{fType=k;fAuto=false;drawForm()};tp.append(b)});
+ $("#ra").hidden=!fVoice;if(fVoice)$("#ra").src=fVoice;
+}
+function renderCare(){updateDashboardStats();$("#sc").textContent=codeOf();$("#ph").value=S.phone||"";
+ const ml=$("#ml");ml.innerHTML="";
+ S.meds.forEach(m=>{
+  const r=document.createElement("div");r.className="box row";const th=document.createElement("div");th.className="pv";th.style.cssText="width:56px;height:56px;padding:3px";th.innerHTML=m.photo?'<img alt="" src="'+m.photo+'">':mIcon(m);
+  const n=document.createElement("div");n.style.cssText="font-weight:700;min-width:0";n.textContent=mPrim(m)+(m.voice?" 🎙":"");const linked=patients.find(p=>String(p.id)===String(m.patientId));if(linked){const who=document.createElement("div");who.className="small";who.textContent="المريض: "+linked.name;n.append(who)}
+  const s=document.createElement("div");s.className="small";s.style.direction="ltr";s.textContent=(mSec(m)?mSec(m)+" · ":"")+m.times.map(fmtHM).join(" · ")+(m.end?" · ⏳ "+new Date(m.end).toLocaleDateString(S.lang==="ar"?"ar-u-nu-latn":"en-US",{day:"numeric",month:"short"}):"");if(m.strength&&m.dose){const q=document.createElement("div");q.className="small";q.style.cssText="color:var(--g);font-weight:800";q.textContent=doseInstruction(m);n.append(q)}n.append(s);
+  const e=document.createElement("button");e.className="btn";e.textContent="✎";e.onclick=()=>{fillForm(m);$("#ft").scrollIntoView()};
+  const d=document.createElement("button");d.className="btn";d.textContent="🗑";d.onclick=()=>{S.meds=S.meds.filter(x=>x.id!==m.id);save();sig="";if(editId===m.id)fillForm(null);renderCare();tick()};
+  const g=document.createElement("div");g.style.cssText="display:flex;gap:8px";g.append(e,d);const lft=document.createElement("div");lft.style.cssText="display:flex;gap:12px;align-items:center;min-width:0";lft.append(th,n);r.append(lft,g);ml.append(r)});
+ const al=$("#al");al.innerHTML="";if(!S.log.length)al.textContent=L("empty");
+ S.log.slice(0,12).forEach(l=>{const d=document.createElement("div");d.className="log"+(l.w?" w":"");d.textContent=fmtT(l.t)+"  "+l.n+" — "+L("l_"+l.k);if(l.w&&S.phone){const a=document.createElement("a");a.href="sms:"+S.phone+"?&body="+encodeURIComponent(L("smsMsg").replace("{n}",l.n));a.textContent=L("smsBtn");a.className="btn";a.style.cssText="display:flex;align-items:center;margin-top:8px;text-decoration:none;min-height:46px";d.append(a)}al.append(d)})
+}
+$("#cx").onclick=()=>{$("#care").hidden=true;$("#app").hidden=false;$("#homeOverview").hidden=false;document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.nav==="home"))};
+$("#cn").onclick=()=>fillForm(null);
+["#mn","#me"].forEach(q=>$(q).addEventListener("input",()=>{if(fAuto){fType=guessType($("#mn").value+" "+$("#me").value);drawForm()}}));
+$("#at").onclick=()=>{const v=$("#mt").value;if(v&&!fTimes.includes(v)){fTimes.push(v);drawForm()}};
+$("#mp").onchange=e=>{
+ const f=e.target.files[0];if(!f)return;const fr=new FileReader();
+ fr.onload=()=>{const i=new Image();i.onload=()=>{const c=document.createElement("canvas"),s=Math.min(1,320/Math.max(i.width,i.height));c.width=i.width*s;c.height=i.height*s;c.getContext("2d").drawImage(i,0,0,c.width,c.height);fPhoto=c.toDataURL("image/jpeg",.75);drawForm()};i.src=fr.result};
+ fr.readAsDataURL(f);e.target.value=""
+};
+$("#rec").onclick=async()=>{
+ if(recorder){recorder.stop();return}
+ try{const st=await navigator.mediaDevices.getUserMedia({audio:true}),ch=[];recorder=new MediaRecorder(st);
+  recorder.ondataavailable=e=>ch.push(e.data);
+  recorder.onstop=()=>{st.getTracks().forEach(x=>x.stop());const fr=new FileReader();fr.onload=()=>{fVoice=fr.result;drawForm()};fr.readAsDataURL(new Blob(ch,{type:recorder.mimeType}));recorder=null;drawForm()};
+  recorder.start();drawForm()}
+ catch(e){recorder=null;$("#rs").textContent=L("mic")}
+};
+$("#add").onclick=async()=>{
+ const name=$("#mn").value.trim(),nameEn=$("#me").value.trim();
+ if(!fTimes.length&&$("#mt").value)fTimes.push($("#mt").value);
+ if((!name&&!nameEn)||!fTimes.length){alert(L("need"));return}
+ const btn=$("#add");btn.disabled=true;
+ try{
+  const photo=await uploadMediaValue(fPhoto,"image"),voice=await uploadMediaValue(fVoice,"audio");
+  const m={id:editId||Date.now(),name,nameEn,patientId:$("#mPatient").value||null,type:fType,strength:Number($("#mStrength").value)||null,dose:Number($("#mDose").value)||null,times:[...fTimes].sort(),photo,voice,end:editId?((S.meds.find(x=>x.id===editId)||{}).end||null):null};
+  if(editId)S.meds=S.meds.map(x=>x.id===editId?m:x);else S.meds.push(m);
+  logIt("saved",name||nameEn);sig="";fillForm(null);renderCare();tick()
+ }catch(e){alert("لم يتم حفظ الدواء لأن رفع الصورة أو التسجيل إلى الموقع لم ينجح. تحقق من اتصال الإنترنت ثم حاول مجدداً.\n"+e.message)}
+ finally{btn.disabled=false}
+};
+$("#tst").onclick=()=>{
+ const m=S.meds[0]||{id:0,name:"تجريبي",nameEn:"Sample",type:"pill",times:["08:00"]};
+ test={m,tm:m.times[0],at:Date.now(),key:"T"+Date.now(),lim:1e4,snz:0};lastVoice=0;sig="";$("#care").hidden=true;tick()
+};
+
+function doseInstruction(m){
+ if(!m||!m.strength||!m.dose||m.strength<=0||m.dose<=0)return "";
+ if(!["pill"].includes(m.type||"pill"))return "الجرعة الموصوفة: "+m.dose+" ملغ";
+ const n=m.dose/m.strength;if(!Number.isFinite(n)||n<=0)return "";
+ const near=(a,b)=>Math.abs(a-b)<0.001;
+ let q="";if(near(n,.25))q="ربع حبة";else if(near(n,.5))q="نصف حبة";else if(near(n,.75))q="ثلاثة أرباع الحبة";else if(near(n,1))q="حبة واحدة";else if(near(n,1.5))q="حبة ونصف";else if(near(n,2))q="حبتان";else q="كمية حسابية "+Number(n.toFixed(2))+" حبة؛ لا تقسّم القرص قبل مراجعة الصيدلي";
+ return "الجرعة: "+m.dose+" ملغ — خذ "+q+" (تركيز الحبة "+m.strength+" ملغ)";
+}
+function tabletUnitSvg(part){
+ const base='<ellipse cx="42" cy="31" rx="34" ry="23" fill="#fffdf7" stroke="#167d43" stroke-width="4"/>';
+ let fill='';
+ if(part===0.5) fill='<path d="M42 8 A34 23 0 0 0 42 54 Z" fill="#70c58b"/>';
+ else if(part===0.25) fill='<path d="M42 31 L42 8 A34 23 0 0 0 8 31 Z" fill="#70c58b"/>';
+ else if(part===0.75) fill='<path d="M42 8 A34 23 0 1 0 42 54 Z" fill="#70c58b"/>';
+ else if(part===1) fill='<ellipse cx="42" cy="31" rx="31" ry="20" fill="#70c58b"/>';
+ return '<svg class="doseUnit" viewBox="0 0 84 62" role="img" aria-label="'+(part===0.5?'نصف قرص':part===0.25?'ربع قرص':part===0.75?'ثلاثة أرباع قرص':'قرص كامل')+'">'+base+fill+'<path d="M42 9 V53" stroke="#167d43" stroke-width="2.5" stroke-linecap="round" opacity=".85"/></svg>';
+}
+function renderDoseVisual(m){
+ const el=$("#doseVisual");if(!el)return;
+ el.hidden=true;el.innerHTML="";
+ if(!m||m.type!=="pill"||!m.strength||!m.dose||m.strength<=0||m.dose<=0)return;
+ const n=m.dose/m.strength,near=(a,b)=>Math.abs(a-b)<0.001;
+ let parts=[],caption="";
+ if(near(n,.25)){parts=[.25];caption="ربع قرص"}
+ else if(near(n,.5)){parts=[.5];caption="نصف قرص"}
+ else if(near(n,.75)){parts=[.75];caption="ثلاثة أرباع القرص"}
+ else if(near(n,1)){parts=[1];caption="قرص واحد"}
+ else if(near(n,1.5)){parts=[1,.5];caption="قرص ونصف"}
+ else if(near(n,2)){parts=[1,1];caption="قرصان"}
+ else if(Number.isInteger(n)&&n>2&&n<=6){parts=Array(n).fill(1);caption=n+" أقراص"}
+ else return; // لا نعرض رسماً قد يضلل المستخدم عند جرعات غير قياسية
+ el.innerHTML=parts.map(tabletUnitSvg).join("")+ '<div class="doseCount" aria-hidden="true">'+caption+'</div><div class="doseCaption">الصورة توضح الكمية المقررة</div>';
+ el.hidden=false;
+}
+function updateDosePreview(){const st=Number($("#mStrength").value),ds=Number($("#mDose").value),el=$("#dosePreview");if(!st||!ds||st<=0||ds<=0){el.textContent="أدخل التركيز والجرعة لحساب عدد الحبات تلقائياً.";return}const m={type:fType,strength:st,dose:ds};el.textContent=doseInstruction(m)||("الجرعة الموصوفة: "+ds+" ملغ");}
+["#mStrength","#mDose"].forEach(q=>$(q).addEventListener("input",updateDosePreview));
+let patients=[];try{patients=JSON.parse(localStorage.getItem("sanadPatients")||"[]")}catch(e){patients=[]}
+function savePatients(){try{localStorage.setItem("sanadPatients",JSON.stringify(patients))}catch(e){alert("تعذر الحفظ: مساحة التخزين ممتلئة")}}
+function resetPatientForm(){["patientId","patientName","patientAge","patientPhone","patientNotes"].forEach(id=>$("#"+id).value="")}
+function refreshPatientOptions(){const sel=$("#mPatient");if(!sel)return;const chosen=sel.value;sel.innerHTML="<option value=\"\">دواء عام / غير مرتبط بمريض محدد</option>";patients.forEach(p=>{const o=document.createElement("option");o.value=String(p.id);o.textContent=p.name;sel.append(o)});sel.value=chosen}
+function updateDashboardStats(){const pc=$("#patientCount"),mc=$("#medicineCount"),ac=$("#activityCount");if(pc)pc.textContent=patients.length;if(mc)mc.textContent=S.meds.length;if(ac)ac.textContent=S.log.length}
+function renderPatients(){updateDashboardStats();refreshPatientOptions();const list=$("#patientList");list.innerHTML="";if(!patients.length){list.textContent="لا توجد بيانات مرضى مضافة بعد.";return}patients.forEach(p=>{const b=document.createElement("div");b.className="box";const info=document.createElement("div");const name=document.createElement("b");name.textContent=p.name;const meta=document.createElement("div");meta.className="small";meta.textContent=[p.age?"العمر: "+p.age:"",p.phone?"الهاتف: "+p.phone:"",p.notes||""].filter(Boolean).join(" · ");info.append(name,meta);const actions=document.createElement("div");actions.className="patient-actions";const edit=document.createElement("button");edit.className="btn";edit.textContent="تعديل";edit.onclick=()=>{$("#patientId").value=p.id;$("#patientName").value=p.name;$("#patientAge").value=p.age||"";$("#patientPhone").value=p.phone||"";$("#patientNotes").value=p.notes||"";$("#patientName").focus()};const del=document.createElement("button");del.className="btn";del.textContent="حذف";del.onclick=()=>{if(confirm("هل تريد حذف بيانات هذا المريض؟")){patients=patients.filter(x=>x.id!==p.id);savePatients();renderPatients()}};actions.append(edit,del);b.append(info,actions);list.append(b)})}
+$("#savePatient").onclick=()=>{const name=$("#patientName").value.trim();if(!name){alert("يرجى إدخال اسم المريض");return}const id=$("#patientId").value||String(Date.now());const item={id,name,age:$("#patientAge").value,phone:$("#patientPhone").value.trim(),notes:$("#patientNotes").value.trim()};const i=patients.findIndex(p=>String(p.id)===String(id));if(i>=0)patients[i]=item;else patients.push(item);savePatients();resetPatientForm();renderPatients();alert("تم حفظ بيانات المريض")};
+$("#cancelPatient").onclick=resetPatientForm;
+let desiredSection="medicines";
+function applyCareSection(which){const title=$("#care .cin>.row:first-child b");if(title)title.textContent=which==="patients"?"بيانات المرضى":which==="activity"?"سجل النشاط":which==="about"?"من نحن":"الأدوية والجرعات";$("#patientPanel").classList.toggle("active",which==="patients");$("#activityPanel").classList.toggle("active",which==="activity");$("#aboutPanel").classList.toggle("active",which==="about");$("#medicinePanel").classList.toggle("hiddenPanel",which!=="medicines");if(which==="patients")renderPatients();if(which==="activity")$("#activityList").innerHTML=$("#al").innerHTML}
+function setSection(which){if(which==="exit"){if(!confirm("هل تريد الخروج من لوحة التحكم والعودة إلى شاشة التذكير؟"))return;which="home";}document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.nav===which));if(which==="home"){$("#care").hidden=true;$("#gate").hidden=true;$("#app").hidden=false;$("#homeOverview").hidden=false;window.scrollTo({top:0,behavior:"smooth"});return}desiredSection=which;if(which==="about"){openCare();return}openGate()}
+document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>setSection(b.dataset.nav)));
+document.querySelectorAll("[data-jump]").forEach(b=>b.addEventListener("click",()=>setSection(b.dataset.jump)));
+function codeOf(){if(!S.code){S.code=String(1000+Math.floor(Math.random()*9000));save()}return S.code}
+async function shareCode(){
+ const t=L("shareMsg")+codeOf();
+ try{if(navigator.share){await navigator.share({title:"سند · Sanad",text:t,url:location.href});return}}catch(e){if(e&&e.name==="AbortError")return}
+ try{await navigator.clipboard.writeText(t+" "+location.href);alert(L("copied"))}catch(e){prompt("",t+" "+location.href)}
+}
+/* ---- step-by-step setup wizard ---- */
+const newW=()=>({name:"",nameEn:"",times:[],type:"pill",auto:true,photo:null,days:0,strength:"",dose:""});
+let W=newW(),wi=0;
+const wSteps=()=>{const a=[];if(!S.role)a.push("role");if(S.role&&S.role!=="senior"&&!S.pinSet)a.push("pin");a.push("name","dose","time","shape","dur");if(S.role==="senior"&&!S.helperAsked)a.push("helper");a.push("done");return a};
+const mk=(c,t,fn,st)=>{const x=document.createElement("button");x.className=c;x.textContent=t;if(st)x.style.cssText=st;x.onclick=fn;return x};
+function readPhoto(f,cb){if(!f)return;const fr=new FileReader();fr.onload=()=>{const i=new Image();i.onload=()=>{const c=document.createElement("canvas"),s=Math.min(1,320/Math.max(i.width,i.height));c.width=i.width*s;c.height=i.height*s;c.getContext("2d").drawImage(i,0,0,c.width,c.height);cb(c.toDataURL("image/jpeg",.75))};i.src=fr.result};fr.readAsDataURL(f)}
+function wizOpen(){W=newW();wi=0;$("#wiz").hidden=false;wizRender()}
+function wizRender(){
+ const st=wSteps(),k=st[wi],b=$("#wb");b.innerHTML="";
+ $("#wdots").innerHTML=st.map((_,i)=>'<i class="'+(i<=wi?"f":"")+'"></i>').join("");
+ $("#wt").textContent=L("w_"+k);
+ $("#wnext").textContent=L(k==="done"?"wFin":"next");$("#wnext").hidden=k==="role";
+ $("#wback").textContent=L(wi===0?"cancel":"back");$("#wback").hidden=k==="role"||k==="done"||(wi===0&&!S.setupDone);
+ const P=t=>{const p=document.createElement("p");p.className="small";p.textContent=t;b.append(p)};
+ const inp=(lbl,key,dir)=>{const l=document.createElement("label");l.textContent=lbl;const i=document.createElement("input");i.type="text";i.dir=dir;i.value=W[key];i.oninput=()=>{W[key]=i.value;if(W.auto)W.type=guessType(W.name+" "+W.nameEn)};b.append(l,i)};
+ if(k==="role")[["senior","wRoleS","🧓"],["family","wRoleF","👨‍👩‍👧"],["helper","wRoleH","🧑‍⚕️"]].forEach(([r,t,e])=>b.append(mk("btn",e+"  "+L(t),()=>{S.role=r;if(r==="senior"){S.pin="";S.pinSet=1}save();wi=0;wizRender()},"width:100%;min-height:92px;font-size:27px;margin-top:12px;text-align:start;padding:0 20px")));
+ if(k==="pin"){P(L("wPinH"));const i=document.createElement("input");i.id="wp";i.type="tel";i.inputMode="numeric";i.maxLength=4;i.style.cssText="width:100%;min-height:76px;font-size:42px;text-align:center;letter-spacing:14px;border-radius:14px;border:2px solid var(--line);background:var(--card);color:var(--ink)";b.append(i)}
+ if(k==="name"){inp(L("fName"),"name","rtl");inp(L("fNameEn"),"nameEn","ltr");P(L("autoH"))}
+ if(k==="dose"){P("أدخل تركيز القرص والجرعة الموصوفة إن كانت محددة بالملغ. ستظهر للمريض كمية الحبات المحسوبة عند التنبيه.");const l1=document.createElement("label");l1.textContent="تركيز الحبة (ملغ)";const a=document.createElement("input");a.type="number";a.min="0";a.step="any";a.value=W.strength;b.append(l1,a);a.oninput=()=>W.strength=a.value;const l2=document.createElement("label");l2.textContent="الجرعة المطلوبة (ملغ)";const d=document.createElement("input");d.type="number";d.min="0";d.step="any";d.value=W.dose;b.append(l2,d);d.oninput=()=>W.dose=d.value;P("يمكن ترك الحقلين فارغين إذا لم تكن الجرعة بالملغ أو كان الدواء شراباً/بخاخاً.") }
+ if(k==="time"){
+  const r=document.createElement("div");r.className="chips";r.style.marginTop="0";
+  [["pOnce",["08:00"]],["pTwice",["08:00","20:00"]],["pThrice",["08:00","14:00","20:00"]]].forEach(([n,a])=>r.append(mk("btn",L(n),()=>{W.times=[...a];wizRender()},"min-height:64px;font-size:22px")));b.append(r);
+  const row=document.createElement("div");row.className="row";row.style.cssText="justify-content:flex-start;margin-top:16px";
+  const ti=document.createElement("input");ti.type="time";ti.value="08:00";ti.style.maxWidth="190px";
+  row.append(ti,mk("btn","＋",()=>{if(ti.value&&!W.times.includes(ti.value)){W.times.push(ti.value);wizRender()}},"min-height:64px;min-width:64px;font-size:28px;margin:0"));b.append(row);
+  const ch=document.createElement("div");ch.className="chips";W.times.sort().forEach(x=>ch.append(mk("chip",fmtHM(x)+" ✕",()=>{W.times=W.times.filter(y=>y!==x);wizRender()})));b.append(ch)}
+ if(k==="shape"){
+  P(L("wShapeH"));const pv=document.createElement("div");pv.className="pv";pv.style.cssText="width:min(190px,28dvh);height:min(190px,28dvh);margin:10px auto";pv.innerHTML=W.photo?'<img alt="" src="'+W.photo+'">':ICONS[W.type];b.append(pv);
+  const tp=document.createElement("div");tp.className="chips";tp.style.justifyContent="center";
+  TYPES.forEach(t=>{const x=mk("tp"+(t===W.type?" on":""),"",()=>{W.type=t;W.auto=false;W.photo=null;wizRender()});x.innerHTML='<span class="ti">'+ICONS[t]+"</span><span>"+L("t_"+t)+"</span>";tp.append(x)});b.append(tp);
+  const f=document.createElement("input");f.type="file";f.accept="image/*";f.onchange=()=>readPhoto(f.files[0],d=>{W.photo=d;wizRender()});b.append(f)}
+ if(k==="helper"){P(L("wHelperH"));const c=document.createElement("div");c.style.cssText="font-size:56px;font-weight:800;letter-spacing:12px;text-align:center;direction:ltr;margin:10px 0";c.textContent=codeOf();b.append(c,mk("btn p",L("wShare"),shareCode));const l=document.createElement("label");l.textContent=L("wPhone");const i=document.createElement("input");i.id="wph";i.type="tel";i.dir="ltr";i.value=S.phone||"";b.append(l,i)}
+ if(k==="dur")[7,14,30,0].forEach(d=>b.append(mk("btn",L("d"+d),()=>{W.days=d;wizRender()},"width:100%;min-height:76px;font-size:26px;margin-top:12px;"+(W.days===d?"border-color:var(--g);box-shadow:0 0 0 4px var(--g)":""))));
+ if(k==="done"){
+  const m=S.meds[S.meds.length-1];
+  if(m){const c=document.createElement("div");c.className="box";c.style.textAlign="center";
+   const pv=document.createElement("div");pv.className="pv";pv.style.cssText="margin:0 auto 10px";pv.innerHTML=m.photo?'<img alt="" src="'+m.photo+'">':mIcon(m);
+   const n=document.createElement("div");n.style.cssText="font-size:28px;font-weight:800";n.textContent=mPrim(m);
+   const t=document.createElement("div");t.className="small";t.style.direction="ltr";t.textContent=m.times.map(fmtHM).join(" · ");
+   c.append(pv,n,t);b.append(c)}
+  b.append(mk("btn",L("wMore"),()=>{W=newW();wi=wSteps().indexOf("name");wizRender()},"width:100%;min-height:68px;font-size:22px"))}
+}
+async function wizNext(){
+ const k=wSteps()[wi];
+ if(k==="pin"){const v=($("#wp")||{}).value||"";if(!/^\d{4}$/.test(v)){alert(L("wPinH"));return}S.pin=v;S.pinSet=1;save();wizRender();return}
+ if(k==="helper"){S.phone=(($("#wph")||{}).value||"").trim();S.helperAsked=1;save();wizRender();return}
+ if(k==="name"&&!(W.name.trim()||W.nameEn.trim())){alert(L("wNeedN"));return}
+ if(k==="time"&&!W.times.length){alert(L("wNeedT"));return}
+ if(k==="dur"){if((W.strength&&!W.dose)||(!W.strength&&W.dose)){alert("أدخل التركيز والجرعة معاً أو اتركهما فارغين");return}let end=null;if(W.days){const e=new Date();e.setDate(e.getDate()+W.days);e.setHours(23,59,59,0);end=+e}
+  const uploadedPhoto=await uploadMediaValue(W.photo,"image");
+   S.meds.push({id:Date.now(),name:W.name.trim(),nameEn:W.nameEn.trim(),type:W.type,strength:Number(W.strength)||null,dose:Number(W.dose)||null,times:[...W.times].sort(),photo:uploadedPhoto,voice:null,end});
+  logIt("saved",W.name.trim()||W.nameEn.trim());S.setupDone=1;save()}
+ if(k==="done"){S.setupDone=1;save();$("#wiz").hidden=true;$("#care").hidden=true;$("#app").hidden=false;document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.nav==="home"));sig="";tick();return}
+ wi++;wizRender()
+}
+$("#wnext").onclick=wizNext;
+setTimeout(()=>migrateLegacyMedia(),2500);
+$("#wback").onclick=()=>{if(wi===0)$("#wiz").hidden=true;else{wi--;wizRender()}};
+$("#wlang").onclick=()=>setLang(S.lang==="ar"?"en":"ar");
+$("#wadd").onclick=()=>{$("#care").hidden=true;wizOpen()};
+$("#shr").onclick=shareCode;$("#ph").onchange=()=>{S.phone=$("#ph").value.trim();save()};
+
+/* ---- boot ---- */
+try{navigator.wakeLock&&navigator.wakeLock.request("screen").catch(()=>{})}catch(e){}
+setLang(S.lang);updateDashboardStats();setInterval(tick,1000);nativeSync();
+// Start on the actual dashboard. The onboarding wizard is now opened only
+// when the user chooses to add a medicine, instead of covering the app on first visit.
+// This prevents the original "Who will use the app?" screen from masking the new interface.
+if(!S.setupDone&&!S.meds.length){
+  document.querySelectorAll(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.nav==="home"));
+  $("#homeOverview").hidden=false;
+  $("#app").hidden=false;
+  $("#care").hidden=true;
+  $("#wiz").hidden=true;
+  updateDashboardStats();
+}
+</script>
+</body>
+</html>
