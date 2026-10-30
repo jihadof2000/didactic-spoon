@@ -16,6 +16,8 @@ jobs:
           cp app/src/main/assets/www/manifest.json website/manifest.json
           cp app/src/main/assets/www/icon-192.png website/icon-192.png
           cp app/src/main/assets/www/icon-512.png website/icon-512.png
+      - name: Write website version marker
+        run: echo '{"version":"${GITHUB_SHA}"}' > website/version.json
       - name: Deploy website files to InfinityFree
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
