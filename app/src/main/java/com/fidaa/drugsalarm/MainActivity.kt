@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var web: WebView
     private var pendingMic: PermissionRequest? = null
+    private var firstResume = true
 
     private val notifPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val u = request.url
-                if (u.host == "appassets.androidplatform.net") return false
+                if (u.host == "appassets.androidplatform.net" || u.host == "sand.site.je") return false
                 try {
                     startActivity(Intent(Intent.ACTION_VIEW, u))
                 } catch (e: Exception) {
@@ -92,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         web.addJavascriptInterface(Bridge(applicationContext), "Android")
-        web.loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
+        web.loadUrl("https://sand.site.je/")
 
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -126,6 +127,10 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         web.onResume()
+        if (!firstResume && web.url?.startsWith("https://sand.site.je/") == true) {
+            web.reload()
+        }
+        firstResume = false
     }
 
     override fun onPause() {
