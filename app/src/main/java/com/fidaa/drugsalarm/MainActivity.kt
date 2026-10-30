@@ -14,6 +14,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.WebSettings
 import android.webkit.ValueCallback
 import org.json.JSONObject
 import org.json.JSONTokener
@@ -27,7 +28,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var web: WebView
     private var pendingMic: PermissionRequest? = null
     private var pendingFileChooser: ValueCallback<Array<Uri>>? = null
-    private var firstResume = true
     private var pendingSanad: String? = null
     private var pendingPatients: String? = null
     private var loadingLegacy = false
@@ -80,6 +80,9 @@ class MainActivity : AppCompatActivity() {
         s.allowContentAccess = false
         s.textZoom = 100
         s.setSupportZoom(false)
+        // Always fetch the live site rather than requiring a cached copy.
+        s.cacheMode = WebSettings.LOAD_DEFAULT
+        s.blockNetworkLoads = false
 
         val loader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
@@ -213,10 +216,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         web.onResume()
-        if (!firstResume && web.url?.startsWith("https://sand.site.je/") == true) {
-            web.reload()
-        }
-        firstResume = false
     }
 
     override fun onPause() {
