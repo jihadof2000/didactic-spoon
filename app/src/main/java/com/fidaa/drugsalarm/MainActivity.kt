@@ -87,13 +87,13 @@ class MainActivity : AppCompatActivity() {
                     }
                 } else if (url.startsWith(remoteUrl) && !prefs.getBoolean("done", false)) {
                     val script = StringBuilder("(function(){")
-                    if (pendingSanad != null) {
+                    pendingSanad?.let { value ->
                         script.append("if(localStorage.getItem('sanad2')===null)localStorage.setItem('sanad2',")
-                        script.append(JSONObject.quote(pendingSanad)).append(");")
+                        script.append(JSONObject.quote(value)).append(");")
                     }
-                    if (pendingPatients != null) {
+                    pendingPatients?.let { value ->
                         script.append("if(localStorage.getItem('sanadPatients')===null)localStorage.setItem('sanadPatients',")
-                        script.append(JSONObject.quote(pendingPatients)).append(");")
+                        script.append(JSONObject.quote(value)).append(");")
                     }
                     script.append("})();")
                     view.evaluateJavascript(script.toString(), null)
