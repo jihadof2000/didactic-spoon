@@ -341,6 +341,20 @@ function load(){try{const d=JSON.parse(localStorage.getItem("sanad2")||"null");i
  return{lang:"ar",pin:"",pinSet:0,setupDone:0,role:"",meds:[],log:[],done:{},snooze:{},alerted:{},seeded:0}}
 S.meds.forEach(m=>{if(!m.type)m.type='pill';if(m.nameEn===undefined){if(/[A-Za-z]/.test(m.name||'')&&!/[\u0600-\u06FF]/.test(m.name)){m.nameEn=m.name;m.name=''}else m.nameEn=''}});
 function save(){try{localStorage.setItem("sanad2",JSON.stringify(S))}catch(e){}try{nativeSync()}catch(e){}}
+(async function liveSiteVersionCheck(){
+ let current="";
+ async function check(){
+  try{
+   const response=await fetch("/version.json?ts="+Date.now(),{cache:"no-store"});
+   if(!response.ok)return;
+   const data=await response.json();
+   if(current&&data.version&&current!==data.version){location.reload();return}
+   current=data.version||current;
+  }catch(e){}
+ }
+ await check();
+ setInterval(check,30000);
+})();
 async function uploadMediaValue(value,kind){
  if(!value)return null;
  if(typeof value==="string"&&!value.startsWith("data:"))return value;
