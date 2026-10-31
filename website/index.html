@@ -227,7 +227,6 @@ body{overflow:hidden}
     <div class="row"><b style="font-size:26px" data-i="careT"></b><button class="btn" id="cx">✕</button></div>
 
     <section id="medicinePanel">
-    <button class="btn" id="wadd" style="width:100%;margin-top:12px" data-i="addWiz"></button>
     <h3 id="ft"></h3>
     <div class="box">
       <label data-i="fName"></label><input id="mn" type="text" dir="rtl" lang="ar">
@@ -553,7 +552,7 @@ $("#mp").onchange=e=>{
 };
 $("#rec").onclick=async()=>{
  if(recorder){recorder.stop();return}
- try{const st=await navigator.mediaDevices.getUserMedia({audio:true}),ch=[];recorder=new MediaRecorder(st);
+ try{const st=await navigator.mediaDevices.getUserMedia({audio:true}),ch=[];const mimeTypes=["audio/webm;codecs=opus","audio/webm","audio/ogg;codecs=opus","audio/mp4"];const mime=mimeTypes.find(x=>MediaRecorder.isTypeSupported?.(x));recorder=mime?new MediaRecorder(st,{mimeType:mime}):new MediaRecorder(st);
   recorder.ondataavailable=e=>ch.push(e.data);
   recorder.onstop=()=>{st.getTracks().forEach(x=>x.stop());const fr=new FileReader();fr.onload=()=>{fVoice=fr.result;drawForm()};fr.readAsDataURL(new Blob(ch,{type:recorder.mimeType}));recorder=null;drawForm()};
   recorder.start();drawForm()}
