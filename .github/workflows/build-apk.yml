@@ -1,4 +1,5 @@
 name: Build APK
+# Rebuild requested after confirming the step-by-step add button is removed from the embedded app
 
 on:
   push:
