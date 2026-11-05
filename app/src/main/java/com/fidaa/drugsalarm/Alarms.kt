@@ -63,7 +63,7 @@ object Alarms {
         }
     }
 
-    private fun today(now: Long): String =
+    fun today(now: Long): String =
         SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date(now))
 
     /** Called when the page sends a fresh schedule: drop the old alarms, store, schedule the new ones. */

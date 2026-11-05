@@ -22,6 +22,12 @@ class Bridge(private val ctx: Context) {
         Alarms.applyPayload(ctx, json)
     }
 
+    /** Patients this phone follows (JSON from the page): schedules their dose-time alarms here. */
+    @JavascriptInterface
+    fun syncFollow(json: String) {
+        FollowAlarms.apply(ctx, json)
+    }
+
     /** Stops the ringing notification (the page is on screen, or the user answered). */
     @JavascriptInterface
     fun silence() {

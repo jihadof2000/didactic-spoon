@@ -263,6 +263,18 @@ body{overflow:hidden}
       <div id="sc" style="font-size:44px;font-weight:800;letter-spacing:10px;text-align:center;direction:ltr"></div>
       <label data-i="wPhone"></label><input id="ph" type="tel" dir="ltr">
       <button class="btn p" id="shr" data-i="wShare"></button></div>
+    <div class="box" style="margin-top:0"><div class="small" id="scInfo"></div></div>
+    <h3 data-i="fwTitle"></h3>
+    <div class="box" id="followBox">
+      <p class="small" data-i="fwHint"></p>
+      <label for="fwCode" data-i="fwCodeL"></label>
+      <input id="fwCode" type="tel" inputmode="numeric" maxlength="8" dir="ltr" autocomplete="off" placeholder="0000" style="font-size:30px;letter-spacing:8px;text-align:center">
+      <label for="fwName" data-i="fwNameL"></label>
+      <input id="fwName" type="text" autocomplete="off">
+      <button class="btn p" id="fwAdd" data-i="fwAdd"></button>
+      <div class="small" id="fwNative" style="margin-top:8px"></div>
+      <div id="fwList"></div>
+    </div>
     <h3 data-i="meds"></h3><div id="ml"></div>
     <button class="btn" id="tst" style="width:100%;margin-top:10px" data-i="test"></button>
     <h3 data-i="act"></h3><div class="box" id="al"></div>
@@ -346,7 +358,7 @@ const mIcon=m=>ICONS[m.type]||ICONS.pill;
 function load(){try{const d=JSON.parse(localStorage.getItem("sanad2")||"null");if(d)return d}catch(e){}
  return{lang:"ar",pin:"",pinSet:0,setupDone:0,role:"",meds:[],log:[],done:{},snooze:{},alerted:{},seeded:0}}
 S.meds.forEach(m=>{if(!m.type)m.type='pill';if(m.nameEn===undefined){if(/[A-Za-z]/.test(m.name||'')&&!/[\u0600-\u06FF]/.test(m.name)){m.nameEn=m.name;m.name=''}else m.nameEn=''}});
-function save(){try{localStorage.setItem("sanad2",JSON.stringify(S))}catch(e){}try{nativeSync()}catch(e){}}
+function save(){try{localStorage.setItem("sanad2",JSON.stringify(S))}catch(e){}try{nativeSync()}catch(e){}try{cloudPush()}catch(e){}}
 (async function liveSiteVersionCheck(){
  let current="";
  async function check(){
@@ -712,6 +724,151 @@ setTimeout(()=>migrateLegacyMedia(),2500);
 $("#wback").onclick=()=>{if(wi===0)$("#wiz").hidden=true;else{wi--;wizRender()}};
 $("#wlang").onclick=()=>setLang(S.lang==="ar"?"en":"ar");
 $("#shr").onclick=shareCode;$("#ph").onchange=()=>{S.phone=$("#ph").value.trim();save()};
+
+/* ---- remote follow: patient uploads its schedule, followers enter the code ---- */
+const API="/api/sync.php?i=1";
+Object.assign(D.ar,{
+ fwTitle:"متابعة مريض آخر",
+ fwHint:"إذا شاركك مريض رمز المتابعة فأدخله هنا. سيصلك تنبيه على هذا الجوال في موعد كل دواء له، فتتصل به وتذكّره.",
+ fwCodeL:"رمز المتابعة الذي وصلك من المريض",fwNameL:"اسم المريض (للتعريف فقط)",fwAdd:"➕ ربط ومتابعة",
+ fwNone:"لا يوجد مرضى تتابعهم حتى الآن.",fwDel:"إيقاف المتابعة",fwCall:"📞 اتصال بالمريض",fwPh:"رقم هاتف المريض (اختياري)",
+ fwTaken:"✔ أخذه",fwLate:"⏳ لم يؤكد بعد",fwUpd:"آخر تحديث من المريض: ",fwNoMeds:"لم يضف المريض أدوية بعد.",fwGone:"تعذر العثور على هذا الرمز عند المريض.",
+ fwBad:"أدخل رمز المتابعة (4 أرقام أو أكثر).",fwSelf:"هذا هو رمزك أنت. أدخل رمز المريض الذي تريد متابعته.",
+ fwNF:"الرمز غير صحيح. تأكد منه مع المريض.",fwRate:"محاولات خاطئة كثيرة. انتظر 10 دقائق ثم حاول مجدداً.",fwLim:"وصل هذا المريض إلى الحد الأقصى من المتابعين.",
+ fwErr:"تعذر الاتصال بالخادم. تحقق من الإنترنت وحاول مرة أخرى.",fwOk:"تم الربط ✔ سيصلك تنبيه عند موعد كل دواء.",
+ fwDelQ:"هل تريد إيقاف متابعة هذا المريض؟",fwOldApp:"لكي يصلك التنبيه والتطبيق مغلق ثبّت أحدث نسخة من التطبيق (APK).",
+ fwWebOnly:"التنبيه والتطبيق مغلق يعمل في تطبيق الأندرويد فقط. في المتصفح يظهر لك الجدول عند فتح الصفحة.",
+ fwNativeOk:"✔ التنبيه مفعّل على هذا الجوال حتى لو كان التطبيق مغلقاً أو الشاشة مطفأة.",
+ scMore:n=>n>0?"يتابعك الآن "+n+(n===1?" شخص":" أشخاص"):"لم يربط أحد رمزك بعد. شارك الرمز ليتابعك من تثق به."
+});
+Object.assign(D.en,{
+ fwTitle:"Follow another patient",
+ fwHint:"If a patient shared a follow code with you, enter it here. This phone will alert you at each dose time so you can call and remind them.",
+ fwCodeL:"Follow code from the patient",fwNameL:"Patient name (label only)",fwAdd:"➕ Link and follow",
+ fwNone:"You are not following anyone yet.",fwDel:"Stop following",fwCall:"📞 Call the patient",fwPh:"Patient’s phone (optional)",
+ fwTaken:"✔ Taken",fwLate:"⏳ Not confirmed yet",fwUpd:"Last update from patient: ",fwNoMeds:"The patient has not added medicines yet.",fwGone:"This code could not be found on the patient’s side.",
+ fwBad:"Enter the follow code (4 digits or more).",fwSelf:"That is your own code. Enter the code of the patient you want to follow.",
+ fwNF:"Wrong code. Please check it with the patient.",fwRate:"Too many wrong attempts. Wait 10 minutes and try again.",fwLim:"This patient has reached the maximum number of followers.",
+ fwErr:"Could not reach the server. Check your internet and try again.",fwOk:"Linked ✔ You will be alerted at every dose time.",
+ fwDelQ:"Stop following this patient?",fwOldApp:"To be alerted while the app is closed, install the latest version of the app (APK).",
+ fwWebOnly:"Alerts while the app is closed work in the Android app only. In a browser you see the schedule when the page is open.",
+ fwNativeOk:"✔ Alerts are active on this phone even when the app is closed or the screen is off.",
+ scMore:n=>n>0?n+(n===1?" person is":" people are")+" following you":"Nobody has linked your code yet. Share it with someone you trust."
+});
+const todayStr=()=>{const d=new Date();return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())};
+const persist=()=>{try{localStorage.setItem("sanad2",JSON.stringify(S))}catch(e){}};
+async function api(action,data){
+ const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({action},data)),cache:"no-store",credentials:"same-origin"});
+ let j={};try{j=await r.json()}catch(e){j={error:"bad_response"}}
+ if(!r.ok&&!j.error)j.error="http"+r.status;
+ return j;
+}
+
+/* patient side */
+let _cloudT=null,_cloudBusy=false,_cloudDirty=true,_followers=0;
+async function ensureCloud(){
+ if(S.syncToken&&S.cloudCode&&S.cloudCode===S.code)return true;
+ try{
+  const j=await api("register",{code:S.code||"",token:S.syncToken||""});
+  if(j.ok){S.code=j.code;S.syncToken=j.token;S.cloudCode=j.code;persist();const sc=$("#sc");if(sc)sc.textContent=S.code;return true}
+ }catch(e){}
+ return false;
+}
+function cloudPush(){_cloudDirty=true;clearTimeout(_cloudT);_cloudT=setTimeout(doPush,1500)}
+async function doPush(){
+ if(_cloudBusy)return;_cloudBusy=true;
+ try{
+  if(!(await ensureCloud()))throw 0;
+  const ds=new Date().toDateString(),taken={};
+  const meds=S.meds.map(m=>{(m.times||[]).forEach(tm=>{if(S.done[String(m.id)+"|"+tm+ds])taken[String(m.id)+"|"+tm]=1});
+   return{id:String(m.id),name:m.name||"",nameEn:m.nameEn||"",type:m.type||"pill",times:m.times||[],end:m.end||0,strength:m.strength||null,dose:m.dose||null}});
+  const j=await api("push",{code:S.code,token:S.syncToken,day:todayStr(),meds,taken});
+  if(j.ok){_cloudDirty=false;_followers=j.followers||0;showFollowers()}
+  else if(j.error==="auth"){S.syncToken="";S.cloudCode="";persist()}   /* file lost on server: register again next time */
+ }catch(e){}
+ _cloudBusy=false;
+}
+function showFollowers(){const el=$("#scInfo");if(el)el.textContent=D[S.lang].scMore(_followers)}
+setInterval(()=>{if(_cloudDirty)doPush()},60000);
+setTimeout(doPush,1200);
+const _shareOld=shareCode;
+shareCode=async function(){if(!(S.syncToken&&S.cloudCode===S.code))await ensureCloud();return _shareOld()};
+
+/* follower side */
+const FB=()=>{if(!S.follow)S.follow={fid:"",list:[]};if(!S.follow.fid){const a=new Uint8Array(12);(window.crypto||{getRandomValues:x=>x.forEach((_,i)=>x[i]=Math.random()*256)}).getRandomValues(a);S.follow.fid=Array.from(a,b=>p2(b.toString(16))).join("")}return S.follow};
+const hasNativeFollow=()=>!!(window.Android&&typeof window.Android.syncFollow==="function");
+function followNative(){
+ if(!hasNativeFollow())return;
+ const F=FB(),today=todayStr();
+ const patients=F.list.filter(p=>p.snap&&!p.gone).map(p=>{const s=p.snap,items=[];
+  (s.meds||[]).forEach(m=>(m.times||[]).forEach(tm=>items.push({id:String(m.id),tm,label:m.name||m.nameEn||"",end:m.end||0,skip:s.day===today&&!!(s.taken&&s.taken[m.id+"|"+tm])})));
+  return{code:p.code,name:p.name,day:s.day||"",items}});
+ try{Android.syncFollow(JSON.stringify({base:location.origin,fid:F.fid,patients}))}catch(e){}
+}
+async function followAdd(){
+ const code=($("#fwCode").value||"").replace(/\D/g,"");
+ if(code.length<4){alert(L("fwBad"));return}
+ if(code===S.code){alert(L("fwSelf"));return}
+ const F=FB(),b=$("#fwAdd");b.disabled=true;
+ try{
+  const j=await api("follow",{code,fid:F.fid});
+  if(!j.ok){alert(j.error==="not_found"?L("fwNF"):j.error==="rate"?L("fwRate"):j.error==="limit"?L("fwLim"):L("fwErr"));return}
+  const name=($("#fwName").value||"").trim()||("#"+code),old=F.list.find(p=>p.code===code);
+  if(old){old.snap=j;old.gone=0;if($("#fwName").value.trim())old.name=name}else F.list.push({code,name,phone:"",snap:j,gone:0});
+  $("#fwCode").value="";$("#fwName").value="";persist();renderFollow();followNative();toast(L("fwOk"),"g");
+ }catch(e){alert(L("fwErr"))}finally{b.disabled=false}
+}
+async function followDel(p){
+ if(!confirm(L("fwDelQ")))return;
+ const F=FB();try{await api("unfollow",{code:p.code,fid:F.fid})}catch(e){}
+ F.list=F.list.filter(x=>x.code!==p.code);persist();renderFollow();followNative();
+}
+let _fwBusy=false;
+async function followRefresh(){
+ const F=S.follow;if(!F||!F.list.length||_fwBusy)return;_fwBusy=true;
+ for(const p of F.list){try{const j=await api("pull",{code:p.code,fid:F.fid});
+  if(j.ok){p.snap=j;p.gone=0}else if(j.error==="not_found"||j.error==="not_following")p.gone=1}catch(e){}}
+ _fwBusy=false;persist();renderFollow();followNative();
+}
+function renderFollow(){
+ const box=$("#fwList");if(!box)return;box.innerHTML="";
+ const nat=$("#fwNative");
+ if(nat)nat.textContent=!(S.follow&&S.follow.list.length)?"":hasNativeFollow()?L("fwNativeOk"):(window.Android?L("fwOldApp"):L("fwWebOnly"));
+ const list=(S.follow&&S.follow.list)||[];
+ if(!list.length){const e=document.createElement("div");e.className="small";e.textContent=L("fwNone");box.append(e);return}
+ const now=Date.now(),today=todayStr();
+ list.forEach(p=>{
+  const c=document.createElement("div");c.className="box";
+  const h=document.createElement("div");h.className="row";
+  const nm=document.createElement("b");nm.textContent=p.name;
+  const cd=document.createElement("span");cd.className="small";cd.style.direction="ltr";cd.textContent="#"+p.code;h.append(nm,cd);c.append(h);
+  const s=p.snap||{},fresh=s.day===today;
+  if(p.gone){const g=document.createElement("div");g.className="small";g.textContent=L("fwGone");c.append(g)}
+  const meds=s.meds||[];
+  if(!p.gone&&!meds.length){const g=document.createElement("div");g.className="small";g.textContent=L("fwNoMeds");c.append(g)}
+  meds.forEach(m=>(m.times||[]).slice().sort().forEach(tm=>{
+   const r=document.createElement("div");r.className="log";
+   const[hh,mm]=tm.split(":").map(Number),at=new Date();at.setHours(hh,mm,0,0);
+   const took=fresh&&s.taken&&s.taken[m.id+"|"+tm];
+   const st=took?L("fwTaken"):(at.getTime()<=now?L("fwLate"):"");
+   r.textContent=fmtHM(tm)+"  "+(m.name||m.nameEn||"")+(st?"  —  "+st:"");
+   if(!took&&at.getTime()<=now)r.className="log w";
+   c.append(r)}));
+  if(s.updated){const u=document.createElement("div");u.className="small";u.textContent=L("fwUpd")+fmtT(s.updated*1000);c.append(u)}
+  const lb=document.createElement("label");lb.textContent=L("fwPh");
+  const ph=document.createElement("input");ph.type="tel";ph.dir="ltr";ph.value=p.phone||"";ph.onchange=()=>{p.phone=ph.value.trim();persist();renderFollow()};
+  c.append(lb,ph);
+  if(p.phone){const a=document.createElement("a");a.href="tel:"+p.phone.replace(/[^\d+]/g,"");a.className="btn p";a.style.cssText="display:flex;align-items:center;justify-content:center;margin-top:8px;text-decoration:none";a.textContent=L("fwCall");c.append(a)}
+  const d=document.createElement("button");d.className="btn";d.style.cssText="width:100%;margin-top:8px";d.textContent=L("fwDel");d.onclick=()=>followDel(p);c.append(d);
+  box.append(c)});
+}
+$("#fwAdd").onclick=followAdd;
+const _renderCareOld=renderCare;
+let _fwLast=0;
+renderCare=function(){_renderCareOld();renderFollow();showFollowers();if(Date.now()-_fwLast>20000){_fwLast=Date.now();followRefresh()}};
+setTimeout(followRefresh,2000);
+setInterval(followRefresh,120000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){followRefresh();if(_cloudDirty)doPush()}});
 
 /* ---- boot ---- */
 try{navigator.wakeLock&&navigator.wakeLock.request("screen").catch(()=>{})}catch(e){}

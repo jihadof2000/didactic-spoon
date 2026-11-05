@@ -8,5 +8,6 @@ import android.content.Intent
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Alarms.rescheduleAll(context)
+        FollowAlarms.rescheduleAll(context)
     }
 }

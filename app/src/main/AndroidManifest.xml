@@ -31,6 +31,8 @@
         </activity>
 
         <receiver android:name=".AlarmReceiver" android:exported="false" />
+        <receiver android:name=".FollowAlarmReceiver" android:exported="false" />
+        <receiver android:name=".FollowRefreshReceiver" android:exported="false" />
 
         <receiver android:name=".BootReceiver" android:exported="true">
             <intent-filter>

@@ -37,7 +37,12 @@ object Notifier {
         nm.createNotificationChannel(ch)
     }
 
-    fun show(ctx: Context, title: String, text: String) {
+    /** Alarm for a followed patient: its own notification id so it never replaces (or gets silenced by) the user's own alarm. */
+    fun showFollow(ctx: Context, key: String, title: String, text: String) {
+        show(ctx, title, text, 5000 + (key.hashCode() and 0x0FFF))
+    }
+
+    fun show(ctx: Context, title: String, text: String, notifId: Int = NOTIF_ID) {
         ensureChannel(ctx)
         val open = Intent(ctx, MainActivity::class.java).apply {
             putExtra("alarm", true)
@@ -62,7 +67,7 @@ object Notifier {
             .setVibrate(VIBRATION)
         val n = b.build()
         n.flags = n.flags or Notification.FLAG_INSISTENT
-        manager(ctx).notify(NOTIF_ID, n)
+        manager(ctx).notify(notifId, n)
     }
 
     fun cancel(ctx: Context) {
